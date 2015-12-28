@@ -1,0 +1,30 @@
+@import "normalize";
+@import "mixins";
+@import "theme";
+@import "global";
+
+html, body {
+  height: 100%;
+}
+body{
+  font-size: @fontSize;
+  margin: 0 auto;
+  font-family: @fontFamily;
+}
+h1 {
+  color: @naviblue;
+}
+#editor {
+  position: relative;
+  height: 80%;
+}
+img.spinner{
+  .vertical-align();
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+img+p {
+  width: 100%;
+  text-align: center;
+}
