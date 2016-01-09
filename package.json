@@ -2,10 +2,23 @@
   "name": "Angular2-TypeScript",
   "version": "0.0.1",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url":"https://github.com/tfg-2016-jjmr/tfg.git"
+  },
+  "author":[
+    "José Javier Felipe Salmoral",
+    "Rafael Miguel Rivero Rodríguez"
+  ],
+  "engines":{
+    "node": "4.2.2"
+  },
+  "keywords": ["Angular2", "TypeScript", "GitHub", "Nodejs", "Express", "Less", "EJS", "Firebase", "Heroku"],
   "scripts": {
     "start": "node ./bin/www",
     "tsc": "tsc",
-    "listen": "tsc -w",
+    "listen": "tsc -w"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
@@ -22,7 +35,8 @@
     "es6-shim": "^0.33.3",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.0",
-    "zone.js": "0.5.10"
+    "zone.js": "0.5.10",
+    "materialize-css": "0.97.5"
   },
   "devDependencies": {
     "concurrently": "^1.0.0",

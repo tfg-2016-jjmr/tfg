@@ -2,19 +2,36 @@
 <html>
 <head>
     <title><%= title %></title>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="/node_modules/materialize-css/dist/css/materialize.min.css"  media="screen,projection"/>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <!--Fonts-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.2/ace.js"></script>
 
-    <!-- 1. Load libraries -->
+    <!-- Load libraries -->
     <script src="/node_modules/angular2/bundles/angular2-polyfills.js"></script>
     <script src="/node_modules/systemjs/dist/system.src.js"></script>
     <script src="/node_modules/rxjs/bundles/Rx.js"></script>
     <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
+    <script src="/node_modules/angular2/bundles/http.min.js"></script>
 
-    <!-- 2. Configure SystemJS -->
+    <script type="text/javascript" src="/node_modules/materialize-css/dist/js/materialize.min.js"></script>
+    <script src="/node_modules/es6-shim/es6-shim.min.js"></script>
+    <!--<script src="/node_modules/systemjs/dist/system-csp-production.js"></script>-->
+
+
+</head>
+
+<body>
+    <!-- Configure SystemJS -->
     <script>
         System.config({
             packages: {
@@ -29,10 +46,22 @@
     </script>
 </head>
 <body>
-    <h1><%= title %></h1>
     <app>
-        <img class="icon icon-64 spinner" src="/images/spinner.svg"/>
-        <p>Loading&hellip;</p>
+        <!--<img class="icon icon-64 spinner" src="/images/spinner.svg"/>-->
+        <!--<p>Loading&hellip;</p>-->
+        <div id="loader">
+            <div class="preloader-wrapper big active">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div><div class="gap-patch">
+                        <div class="circle"></div>
+                    </div><div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </app>
 </body>
 </html>

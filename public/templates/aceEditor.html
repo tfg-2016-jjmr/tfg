@@ -1,3 +1,24 @@
+<nav>
+	<div class="nav-wrapper">
+		<a href="#!" class="brand-logo">TFG2016 - Felipe & Rivero</a>
+		<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+		<ul class="right hide-on-med-and-down" *ngIf="user" >
+			<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
+			<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
+			<!--<li><img src="/images/apple.png" class="left circle icon-32"></img></li>-->
+			<li>
+				<div class="chip">
+					<img src="{{ user.picture }}" alt="Contact Person">
+					{{ user.name.first + " " + user.name.last }}
+				</div>
+			</li>
+		</ul>
+		<ul class="side-nav" id="mobile-demo">
+			<li><a href="#">Mobile</a></li>
+		</ul>
+	</div>
+</nav>
+
 <!--<button (click)="setEditor($event)" href="#">Click aqui</button>-->
 <div id="editor">var developers = {
 	"jjfs": "José Javier Felipe Salmoral",
