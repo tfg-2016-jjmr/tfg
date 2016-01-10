@@ -4,48 +4,15 @@
 
 import {Component, View} from 'angular2/core';
 import {Http, HTTP_PROVIDERS, Response, Request} from 'angular2/http';
-//import 'rxjs/Rx';
 import 'rxjs/Rx';
-//import {Http, Response, HTTP_PROVIDERS, Request, RequestMethod } from 'angular2/http';
 
 @Component({
     selector: 'app',
-    templateUrl: 'templates/aceEditor.html',
-    //template: `
-    //    <nav>
-    //        <div class="nav-wrapper">
-    //            <a href="#!" class="brand-logo">TFG2016 - Felipe & Rivero</a>
-    //            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-    //            <ul class="right hide-on-med-and-down">
-    //                <!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
-    //                <!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
-    //                <!--<li><img src="/images/apple.png" class="left circle icon-32"></img></li>-->
-    //                <li>
-    //                    <div class="chip">
-    //                        <img src="{{ user.picture.thumbnail }}" alt="Contact Person">
-    //                        {{ user.name.first + user.name.last }}
-    //                    </div>
-    //                </li>
-    //            </ul>
-    //            <ul class="side-nav" id="mobile-demo">
-    //                <li><a href="#">Mobile</a></li>
-    //            </ul>
-    //        </div>
-    //    </nav>
-    //    <div id="editor"></div>
-    //`
+    templateUrl: 'templates/app.html',
 })
 export class AppComponent {
 
-    //user =  {
-    //    name:{
-    //        first: "Miguel",
-    //        last: "Rivero"
-    //    },
-    //    picture: {
-    //        thumbnail: '/images/rrr.png'
-    //    }
-    //};
+    user:Object;
 
     constructor (public http: Http) {
         this.getUser();

@@ -23,17 +23,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
             },
             function (_1) {}],
         execute: function() {
-            //import {Http, Response, HTTP_PROVIDERS, Request, RequestMethod } from 'angular2/http';
             AppComponent = (function () {
-                //user =  {
-                //    name:{
-                //        first: "Miguel",
-                //        last: "Rivero"
-                //    },
-                //    picture: {
-                //        thumbnail: '/images/rrr.png'
-                //    }
-                //};
                 function AppComponent(http) {
                     this.http = http;
                     this.getUser();
@@ -61,7 +51,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                 AppComponent = __decorate([
                     core_1.Component({
                         selector: 'app',
-                        templateUrl: 'templates/aceEditor.html',
+                        templateUrl: 'templates/app.html',
                     }), 
                     __metadata('design:paramtypes', [http_1.Http])
                 ], AppComponent);
