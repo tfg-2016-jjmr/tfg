@@ -31,6 +31,13 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     var editor = ace.edit("editor");
                     editor.setTheme("ace/theme/xcode");
                     editor.getSession().setMode("ace/mode/javascript");
+                    /**
+                     * GAPI
+                     */
+                    this.apiKey = "AIzaSyCoRUmlrl47ty3dMkM4nk0hUK55syJkjQw";
+                    console.log('googleOnLoadCallback called');
+                    gapi.client.setApiKey(this.apiKey);
+                    window.setTimeout(this.checkAuth, 1);
                 }
                 AppComponent.prototype.getUser = function () {
                     var _this = this;
@@ -47,6 +54,77 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                             picture: newUser.picture.thumbnail
                         };
                     }, function (err) { return console.log(err); }, function () { return console.log("Get user completed"); });
+                };
+                AppComponent.prototype.checkAuth = function () {
+                    this.clientId = "63791508161-k9331fs3l9gh9iqf40en16j85mnhdlli.apps.googleusercontent.com";
+                    this.scopes = [
+                        'https://www.googleapis.com/auth/drive.metadata.readonly',
+                        'https://www.googleapis.com/auth/plus.login',
+                        'https://www.googleapis.com/auth/userinfo.email'
+                    ];
+                    gapi.auth.authorize({ client_id: this.clientId, scope: this.scopes, immediate: true }, this.handleAuthResult);
+                };
+                AppComponent.prototype.handleAuthResult = function (authResult) {
+                    console.log("ASDASD");
+                    if (authResult && !authResult.error) {
+                        this.getPlusInfo("me");
+                        this.loadDriveApi();
+                    }
+                    else {
+                        this.scopes = [
+                            'https://www.googleapis.com/auth/drive.metadata.readonly',
+                            'https://www.googleapis.com/auth/plus.login',
+                            'https://www.googleapis.com/auth/userinfo.email'
+                        ];
+                        var config = {
+                            'client_id': this.clientId,
+                            'scope': this.scopes.join(' ')
+                        };
+                        console.log("ASDASD => " + config);
+                        gapi.auth.authorize(config, function () {
+                            console.log('login complete');
+                            console.log(gapi.auth.getToken());
+                            this.getPlusInfo("me");
+                            this.loadDriveApi();
+                        });
+                    }
+                };
+                AppComponent.prototype.getPlusInfo = function (userId) {
+                    gapi.client.load('plus', 'v1').then(function () {
+                        var request = gapi.client.plus.people.get({
+                            'userId': userId
+                        });
+                        request.execute(function (resp) {
+                            console.log('ID: ' + resp.id);
+                            console.log('Display Name: ' + resp.displayName);
+                            console.log('Image URL: ' + resp.image.url);
+                            console.log('Profile URL: ' + resp.url);
+                        });
+                    });
+                };
+                AppComponent.prototype.loadDriveApi = function () {
+                    gapi.client.load('drive', 'v2', this.listFiles);
+                };
+                /**
+                 * Print files.
+                 */
+                AppComponent.prototype.listFiles = function () {
+                    var request = gapi.client.drive.files.list({
+                        'maxResults': 10
+                    });
+                    request.execute(function (resp) {
+                        console.log('Files:');
+                        var files = resp.items;
+                        if (files && files.length > 0) {
+                            for (var i = 0; i < files.length; i++) {
+                                var file = files[i];
+                                console.log(file.title + ' (' + file.id + ')');
+                            }
+                        }
+                        else {
+                            console.log('No files found.');
+                        }
+                    });
                 };
                 AppComponent = __decorate([
                     core_1.Component({
