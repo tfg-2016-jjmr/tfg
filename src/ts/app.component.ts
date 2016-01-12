@@ -4,11 +4,11 @@
 
 import {Component, View} from 'angular2/core';
 import {Http, HTTP_PROVIDERS, Response, Request} from 'angular2/http';
+import {MockBackend} from 'angular2/http/testing';
 import 'rxjs/Rx';
 
 declare var gapi: any;
 declare var ace: any;
-
 
 
 interface User {
@@ -132,7 +132,7 @@ export class AppComponent {
     }
 
     loadDriveApi() {
-        gapi.client.load('drive', 'v2', this.listFiles);
+        gapi.client.load('drive', 'v2', () => {this.listFiles();});
     }
 
     /**
@@ -143,7 +143,7 @@ export class AppComponent {
             'maxResults': 10
         });
 
-        request.execute(function(resp) {
+        request.execute((resp) => {
             console.log('Files:');
             var files = resp.items;
             if (files && files.length > 0) {
@@ -155,6 +155,63 @@ export class AppComponent {
                 console.log('No files found.');
             }
         });
+
+        var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
+        request = gapi.client.drive.files.get({'fileId' : fileId});
+        request.execute((resp) => {
+            console.log("My file: " + resp.id);
+            console.log("WebContentLink: " + resp.webContentLink);
+
+            this.http.get(resp.webContentLink)
+                .map(res => res.text())
+                .subscribe(
+                    data => {
+                        console.log("DATA: " + data);
+                        console.log(data);
+                    },
+                    err => console.log(err),
+                    () => console.log("File loaded successfully")
+                );
+        });
     }
 }
+
+///**
+// * Print files.
+// */
+//function listFiles() {
+//    var request = gapi.client.drive.files.list({
+//        'maxResults': 10
+//    });
+//
+//    request.execute(function(resp) {
+//        console.log('Files:');
+//        var files = resp.items;
+//        if (files && files.length > 0) {
+//            for (var i = 0; i < files.length; i++) {
+//                var file = files[i];
+//                console.log(file.title + ' (' + file.id + ')');
+//            }
+//        } else {
+//            console.log('No files found.');
+//        }
+//    });
+//    var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
+//    request = gapi.client.drive.files.get({'fileId' : fileId});
+//    request.execute(function (resp) {
+//        console.log("My file: " + resp.id);
+//        console.log("WebContentLink: " + resp.webContentLink);
+//
+//        var http = new Http();
+//        http.get(resp.webContentLink)
+//            .map(res => res.text())
+//            .subscribe(
+//                data => {
+//                    console.log("DATA: " + data);
+//                },
+//                err => console.log(err),
+//                () => console.log("File loaded successfully")
+//            );
+//    });
+//}
 

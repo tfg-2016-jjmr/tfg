@@ -122,12 +122,14 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     });
                 };
                 AppComponent.prototype.loadDriveApi = function () {
-                    gapi.client.load('drive', 'v2', this.listFiles);
+                    var _this = this;
+                    gapi.client.load('drive', 'v2', function () { _this.listFiles(); });
                 };
                 /**
                  * Print files.
                  */
                 AppComponent.prototype.listFiles = function () {
+                    var _this = this;
                     var request = gapi.client.drive.files.list({
                         'maxResults': 10
                     });
@@ -144,6 +146,18 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                             console.log('No files found.');
                         }
                     });
+                    var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
+                    request = gapi.client.drive.files.get({ 'fileId': fileId });
+                    request.execute(function (resp) {
+                        console.log("My file: " + resp.id);
+                        console.log("WebContentLink: " + resp.webContentLink);
+                        _this.http.get(resp.webContentLink)
+                            .map(function (res) { return res.text(); })
+                            .subscribe(function (data) {
+                            console.log("DATA: " + data);
+                            console.log(data);
+                        }, function (err) { return console.log(err); }, function () { return console.log("File loaded successfully"); });
+                    });
                 };
                 AppComponent = __decorate([
                     core_1.Component({
@@ -158,4 +172,42 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
         }
     }
 });
+///**
+// * Print files.
+// */
+//function listFiles() {
+//    var request = gapi.client.drive.files.list({
+//        'maxResults': 10
+//    });
+//
+//    request.execute(function(resp) {
+//        console.log('Files:');
+//        var files = resp.items;
+//        if (files && files.length > 0) {
+//            for (var i = 0; i < files.length; i++) {
+//                var file = files[i];
+//                console.log(file.title + ' (' + file.id + ')');
+//            }
+//        } else {
+//            console.log('No files found.');
+//        }
+//    });
+//    var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
+//    request = gapi.client.drive.files.get({'fileId' : fileId});
+//    request.execute(function (resp) {
+//        console.log("My file: " + resp.id);
+//        console.log("WebContentLink: " + resp.webContentLink);
+//
+//        var http = new Http();
+//        http.get(resp.webContentLink)
+//            .map(res => res.text())
+//            .subscribe(
+//                data => {
+//                    console.log("DATA: " + data);
+//                },
+//                err => console.log(err),
+//                () => console.log("File loaded successfully")
+//            );
+//    });
+//}
 //# sourceMappingURL=app.component.js.map
