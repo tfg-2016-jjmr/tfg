@@ -26,6 +26,7 @@ export class AppComponent {
     apiKey: string;
     clientId: string;
     scopes: Array<string>;
+    editor: any;
 
     constructor (public http: Http) {
         this.initCredentials();
@@ -36,10 +37,14 @@ export class AppComponent {
     }
 
     initAce(){
-        var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/xcode");
-        editor.getSession().setMode("ace/mode/javascript");
+        this.editor = ace.edit("editor");
+        this.editor.setTheme("ace/theme/xcode");
+        this.editor.getSession().setMode("ace/mode/javascript");
 
+    }
+
+    replaceEditorContent(newContent: string) {
+        this.editor.setValue(newContent);
     }
 
     getRandomUser(){
@@ -161,21 +166,32 @@ export class AppComponent {
         request = gapi.client.drive.files.get({'fileId' : fileId});
         request.execute((resp) => {
             console.log("My file: " + resp.id);
-            console.log("WebContentLink: " + resp.webContentLink);
+            console.log("downloadUrl: " + resp.downloadUrl);
 
-            var headers = new Headers();
-            headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
-            headers.append("Access-Control-Allow-Origin", "*");
-            this.http.get(resp.webContentLink, {headers: headers})
-                .map(res => res.text())
-                .subscribe(
-                    data => {
-                        console.log("DATA: " + data);
-                        console.log(data);
-                    },
-                    err => console.log(err),
-                    () => console.log("File loaded successfully")
-                );
+            //var headers = new Headers();
+            //headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+            //headers.append("Access-Control-Allow-Origin", "*");
+            //this.http.get(resp.downloadUrl, {headers: headers})
+            //    .map(res => res.text())
+            //    .subscribe(
+            //        data => {
+            //            console.log("DATA: " + data);
+            //            console.log(data);
+            //        },
+            //        err => console.log(err),
+            //        () => console.log("File loaded successfully")
+            //    );
+
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = () => {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    console.log(xmlhttp.responseText);
+                    this.replaceEditorContent(xmlhttp.responseText);
+                }
+            }
+            xmlhttp.open('GET', resp.downloadUrl, true);
+            xmlhttp.setRequestHeader('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+            xmlhttp.send();
         });
     }
 }

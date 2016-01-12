@@ -33,9 +33,12 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     console.log(this);
                 }
                 AppComponent.prototype.initAce = function () {
-                    var editor = ace.edit("editor");
-                    editor.setTheme("ace/theme/xcode");
-                    editor.getSession().setMode("ace/mode/javascript");
+                    this.editor = ace.edit("editor");
+                    this.editor.setTheme("ace/theme/xcode");
+                    this.editor.getSession().setMode("ace/mode/javascript");
+                };
+                AppComponent.prototype.replaceEditorContent = function (newContent) {
+                    this.editor.setValue(newContent);
                 };
                 AppComponent.prototype.getRandomUser = function () {
                     var _this = this;
@@ -151,16 +154,30 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     request = gapi.client.drive.files.get({ 'fileId': fileId });
                     request.execute(function (resp) {
                         console.log("My file: " + resp.id);
-                        console.log("WebContentLink: " + resp.webContentLink);
-                        var headers = new http_1.Headers();
-                        headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
-                        headers.append("Access-Control-Allow-Origin", "*");
-                        _this.http.get(resp.webContentLink, { headers: headers })
-                            .map(function (res) { return res.text(); })
-                            .subscribe(function (data) {
-                            console.log("DATA: " + data);
-                            console.log(data);
-                        }, function (err) { return console.log(err); }, function () { return console.log("File loaded successfully"); });
+                        console.log("downloadUrl: " + resp.downloadUrl);
+                        //var headers = new Headers();
+                        //headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+                        //headers.append("Access-Control-Allow-Origin", "*");
+                        //this.http.get(resp.downloadUrl, {headers: headers})
+                        //    .map(res => res.text())
+                        //    .subscribe(
+                        //        data => {
+                        //            console.log("DATA: " + data);
+                        //            console.log(data);
+                        //        },
+                        //        err => console.log(err),
+                        //        () => console.log("File loaded successfully")
+                        //    );
+                        var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.onreadystatechange = function () {
+                            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                                console.log(xmlhttp.responseText);
+                                _this.replaceEditorContent(xmlhttp.responseText);
+                            }
+                        };
+                        xmlhttp.open('GET', resp.downloadUrl, true);
+                        xmlhttp.setRequestHeader('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+                        xmlhttp.send();
                     });
                 };
                 AppComponent = __decorate([
