@@ -3,7 +3,7 @@
  */
 
 import {Component, View} from 'angular2/core';
-import {Http, HTTP_PROVIDERS, Response, Request} from 'angular2/http';
+import {Http, HTTP_PROVIDERS, Response, Request, Headers} from 'angular2/http';
 import {MockBackend} from 'angular2/http/testing';
 import 'rxjs/Rx';
 
@@ -97,6 +97,7 @@ export class AppComponent {
         if (authResult && !authResult.error) {
             this.getPlusInfo("me");
             this.loadDriveApi();
+            console.log(gapi.auth.getToken());
         } else {
             console.log(this.clientId);
             console.log(this.scopes);
@@ -162,7 +163,10 @@ export class AppComponent {
             console.log("My file: " + resp.id);
             console.log("WebContentLink: " + resp.webContentLink);
 
-            this.http.get(resp.webContentLink)
+            var headers = new Headers();
+            headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+            headers.append("Access-Control-Allow-Origin", "*");
+            this.http.get(resp.webContentLink, {headers: headers})
                 .map(res => res.text())
                 .subscribe(
                     data => {

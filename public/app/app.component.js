@@ -87,6 +87,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     if (authResult && !authResult.error) {
                         this.getPlusInfo("me");
                         this.loadDriveApi();
+                        console.log(gapi.auth.getToken());
                     }
                     else {
                         console.log(this.clientId);
@@ -151,7 +152,10 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     request.execute(function (resp) {
                         console.log("My file: " + resp.id);
                         console.log("WebContentLink: " + resp.webContentLink);
-                        _this.http.get(resp.webContentLink)
+                        var headers = new http_1.Headers();
+                        headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+                        headers.append("Access-Control-Allow-Origin", "*");
+                        _this.http.get(resp.webContentLink, { headers: headers })
                             .map(function (res) { return res.text(); })
                             .subscribe(function (data) {
                             console.log("DATA: " + data);
