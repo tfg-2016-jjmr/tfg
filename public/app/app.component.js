@@ -26,13 +26,15 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
             AppComponent = (function () {
                 function AppComponent(http) {
                     this.http = http;
-                    this.getUser();
-                    console.log('aqui');
+                    this.getRandomUser();
+                    this.initAce();
+                }
+                AppComponent.prototype.initAce = function () {
                     var editor = ace.edit("editor");
                     editor.setTheme("ace/theme/xcode");
                     editor.getSession().setMode("ace/mode/javascript");
-                }
-                AppComponent.prototype.getUser = function () {
+                };
+                AppComponent.prototype.getRandomUser = function () {
                     var _this = this;
                     this.http.get('https://randomuser.me/api/')
                         .map(function (res) { return res.json(); })
@@ -40,13 +42,15 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                         //var newUser = data.json().results[0];
                         var newUser = data.results[0]['user'];
                         _this.user = {
-                            name: {
-                                first: newUser.name.first[0].substring(0, 1).toUpperCase() + newUser.name.first.substring(1),
-                                last: newUser.name.last[0].substring(0, 1).toUpperCase() + newUser.name.last.substring(1)
-                            },
+                            displayName: newUser.name.first[0].substring(0, 1).toUpperCase() + newUser.name.first.substring(1) + " " + newUser.name.last[0].substring(0, 1).toUpperCase() + newUser.name.last.substring(1),
                             picture: newUser.picture.thumbnail
                         };
                     }, function (err) { return console.log(err); }, function () { return console.log("Get user completed"); });
+                };
+                ;
+                AppComponent.prototype.setUser = function (displayname, picture) {
+                    this.user.displayName = displayname;
+                    this.user.picture = picture;
                 };
                 AppComponent = __decorate([
                     core_1.Component({
