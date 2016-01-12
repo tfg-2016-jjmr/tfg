@@ -12,64 +12,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
     var core_1, http_1;
-    var apiKey, clientId, scopes, AppComponent;
-    function handleAuthResult(authResult) {
-        console.log("ASDASD");
-        if (authResult && !authResult.error) {
-            getPlusInfo("me");
-            loadDriveApi();
-        }
-        else {
-            var config = {
-                'client_id': clientId,
-                'scope': scopes.join(' ')
-            };
-            console.log("ASDASD => " + config);
-            gapi.auth.authorize(config, function () {
-                console.log('login complete');
-                console.log(gapi.auth.getToken());
-                getPlusInfo("me");
-                loadDriveApi();
-            });
-        }
-    }
-    function getPlusInfo(userId) {
-        gapi.client.load('plus', 'v1').then(function () {
-            var request = gapi.client.plus.people.get({
-                'userId': userId
-            });
-            request.execute(function (resp) {
-                console.log('ID: ' + resp.id);
-                console.log('Display Name: ' + resp.displayName);
-                console.log('Image URL: ' + resp.image.url);
-                console.log('Profile URL: ' + resp.url);
-            });
-        });
-    }
-    function loadDriveApi() {
-        gapi.client.load('drive', 'v2', listFiles);
-    }
-    /**
-     * Print files.
-     */
-    function listFiles() {
-        var request = gapi.client.drive.files.list({
-            'maxResults': 10
-        });
-        request.execute(function (resp) {
-            console.log('Files:');
-            var files = resp.items;
-            if (files && files.length > 0) {
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    console.log(file.title + ' (' + file.id + ')');
-                }
-            }
-            else {
-                console.log('No files found.');
-            }
-        });
-    }
+    var AppComponent;
     return {
         setters:[
             function (core_1_1) {
@@ -80,29 +23,21 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
             },
             function (_1) {}],
         execute: function() {
-            apiKey = "AIzaSyCoRUmlrl47ty3dMkM4nk0hUK55syJkjQw";
-            clientId = "63791508161-k9331fs3l9gh9iqf40en16j85mnhdlli.apps.googleusercontent.com";
-            scopes = [
-                'https://www.googleapis.com/auth/drive.metadata.readonly',
-                'https://www.googleapis.com/auth/plus.login',
-                'https://www.googleapis.com/auth/userinfo.email'
-            ];
+            ;
             AppComponent = (function () {
                 function AppComponent(http) {
                     this.http = http;
-                    this.getUser();
-                    console.log('aqui');
+                    this.initCredentials();
+                    //this.getRandomUser();
+                    this.initAce();
+                    console.log(this);
+                }
+                AppComponent.prototype.initAce = function () {
                     var editor = ace.edit("editor");
                     editor.setTheme("ace/theme/xcode");
                     editor.getSession().setMode("ace/mode/javascript");
-                    /**
-                     * GAPI
-                     */
-                    console.log('googleOnLoadCallback called');
-                    gapi.client.setApiKey(apiKey);
-                    window.setTimeout(this.checkAuth, 1);
-                }
-                AppComponent.prototype.getUser = function () {
+                };
+                AppComponent.prototype.getRandomUser = function () {
                     var _this = this;
                     this.http.get('https://randomuser.me/api/')
                         .map(function (res) { return res.json(); })
@@ -110,16 +45,105 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                         //var newUser = data.json().results[0];
                         var newUser = data.results[0]['user'];
                         _this.user = {
-                            name: {
-                                first: newUser.name.first[0].substring(0, 1).toUpperCase() + newUser.name.first.substring(1),
-                                last: newUser.name.last[0].substring(0, 1).toUpperCase() + newUser.name.last.substring(1)
-                            },
+                            displayName: newUser.name.first[0].substring(0, 1).toUpperCase() + newUser.name.first.substring(1) + " " + newUser.name.last[0].substring(0, 1).toUpperCase() + newUser.name.last.substring(1),
                             picture: newUser.picture.thumbnail
                         };
                     }, function (err) { return console.log(err); }, function () { return console.log("Get user completed"); });
                 };
+                ;
+                AppComponent.prototype.setUser = function (displayname, picture) {
+                    this.user = {
+                        displayName: displayname,
+                        picture: picture
+                    };
+                    //this.user.displayName = displayname;
+                    //this.user.picture = picture;
+                };
+                AppComponent.prototype.initCredentials = function () {
+                    this.apiKey = "AIzaSyCoRUmlrl47ty3dMkM4nk0hUK55syJkjQw";
+                    this.clientId = "63791508161-k9331fs3l9gh9iqf40en16j85mnhdlli.apps.googleusercontent.com";
+                    this.scopes = [
+                        'https://www.googleapis.com/auth/drive.metadata.readonly',
+                        'https://www.googleapis.com/auth/plus.login',
+                        'https://www.googleapis.com/auth/userinfo.email'
+                    ];
+                    /**
+                     * GAPI
+                     */
+                    console.log('googleOnLoadCallback called');
+                    gapi.client.setApiKey(this.apiKey);
+                    //setTimeout(()=>{this.checkAuth();},1);
+                    this.checkAuth();
+                };
                 AppComponent.prototype.checkAuth = function () {
-                    gapi.auth.authorize({ client_id: clientId, scope: scopes, immediate: true }, handleAuthResult);
+                    var _this = this;
+                    gapi.auth.authorize({ client_id: this.clientId, scope: this.scopes, immediate: true }, function (data) { _this.handleAuthResult(data); });
+                };
+                AppComponent.prototype.handleAuthResult = function (authResult) {
+                    var _this = this;
+                    console.log("ASDASD");
+                    console.log(this);
+                    var self = this;
+                    if (authResult && !authResult.error) {
+                        this.getPlusInfo("me");
+                        this.loadDriveApi();
+                    }
+                    else {
+                        console.log(this.clientId);
+                        console.log(this.scopes);
+                        var config = {
+                            'client_id': this.clientId,
+                            'scope': this.scopes.join(' ')
+                        };
+                        console.log("ASDASD => " + config);
+                        gapi.auth.authorize(config, function () {
+                            console.log(_this);
+                            console.log('login complete');
+                            console.log(gapi.auth.getToken());
+                            _this.getPlusInfo("me");
+                            _this.loadDriveApi();
+                        });
+                    }
+                };
+                AppComponent.prototype.getPlusInfo = function (userId) {
+                    var _this = this;
+                    gapi.client.load('plus', 'v1').then(function () {
+                        var request = gapi.client.plus.people.get({
+                            'userId': userId
+                        });
+                        request.execute(function (resp) {
+                            console.log('ID: ' + resp.id);
+                            console.log('Display Name: ' + resp.displayName);
+                            console.log('Image URL: ' + resp.image.url);
+                            console.log('Profile URL: ' + resp.url);
+                            console.log(_this);
+                            _this.setUser(resp.displayName, resp.image.url);
+                        });
+                    });
+                };
+                AppComponent.prototype.loadDriveApi = function () {
+                    gapi.client.load('drive', 'v2', this.listFiles);
+                };
+                /**
+                 * Print files.
+                 */
+                AppComponent.prototype.listFiles = function () {
+                    var request = gapi.client.drive.files.list({
+                        'maxResults': 10
+                    });
+                    request.execute(function (resp) {
+                        console.log('Files:');
+                        var files = resp.items;
+                        if (files && files.length > 0) {
+                            for (var i = 0; i < files.length; i++) {
+                                var file = files[i];
+                                console.log(file.title + ' (' + file.id + ')');
+                            }
+                        }
+                        else {
+                            console.log('No files found.');
+                        }
+                    });
                 };
                 AppComponent = __decorate([
                     core_1.Component({
