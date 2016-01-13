@@ -120,7 +120,7 @@ export class AppComponent {
         var paramValue = getUrlParameters("ids");
         if (paramValue != null) {
             console.log("VALUE" + paramValue);
-            gapi.client.load('drive', 'v2', () => {this.getDriveFile(paramValue[0]);});
+            gapi.client.load('drive', 'v2', () => {this.loadDriveFile(paramValue[0]);});
         }
     }
 
@@ -166,10 +166,10 @@ export class AppComponent {
         });
 
         var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
-        this.getDriveFile(fileId);
+        this.loadDriveFile(fileId);
     }
 
-    getDriveFile(fileId: string) {
+    loadDriveFile(fileId: string) {
         var request = gapi.client.drive.files.get({'fileId' : fileId});
         request.execute((resp) => {
             console.log("My file: " + resp.id);

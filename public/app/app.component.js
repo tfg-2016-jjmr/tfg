@@ -129,7 +129,7 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     var paramValue = getUrlParameters("ids");
                     if (paramValue != null) {
                         console.log("VALUE" + paramValue);
-                        gapi.client.load('drive', 'v2', function () { _this.getDriveFile(paramValue[0]); });
+                        gapi.client.load('drive', 'v2', function () { _this.loadDriveFile(paramValue[0]); });
                     }
                 };
                 AppComponent.prototype.getPlusInfo = function (userId) {
@@ -173,9 +173,9 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                         }
                     });
                     var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
-                    this.getDriveFile(fileId);
+                    this.loadDriveFile(fileId);
                 };
-                AppComponent.prototype.getDriveFile = function (fileId) {
+                AppComponent.prototype.loadDriveFile = function (fileId) {
                     var _this = this;
                     var request = gapi.client.drive.files.get({ 'fileId': fileId });
                     request.execute(function (resp) {
