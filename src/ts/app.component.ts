@@ -44,7 +44,7 @@ export class AppComponent {
     }
 
     replaceEditorContent(newContent: string) {
-        this.editor.setValue(newContent);
+        this.editor.setValue(newContent, -1);
     }
 
     getRandomUser(){
@@ -100,24 +100,26 @@ export class AppComponent {
         console.log(this);
         var self = this;
         if (authResult && !authResult.error) {
-            this.getPlusInfo("me");
-            this.loadDriveApi();
-            console.log(gapi.auth.getToken());
+            this.initApp();
         } else {
-            console.log(this.clientId);
-            console.log(this.scopes);
             var config = {
                 'client_id': this.clientId,
                 'scope': this.scopes.join(' ')
             };
-            console.log("ASDASD => " + config);
             gapi.auth.authorize(config, () => {
                 console.log(this);
                 console.log('login complete');
-                console.log(gapi.auth.getToken());
-                this.getPlusInfo("me");
-                this.loadDriveApi();
+                this.initApp();
             });
+        }
+    }
+    initApp() {
+        this.getPlusInfo("me");
+        //this.loadDriveApi();
+        var paramValue = getUrlParameters("ids");
+        if (paramValue != null) {
+            console.log("VALUE" + paramValue);
+            gapi.client.load('drive', 'v2', () => {this.getDriveFile(paramValue[0]);});
         }
     }
 
@@ -163,75 +165,51 @@ export class AppComponent {
         });
 
         var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
-        request = gapi.client.drive.files.get({'fileId' : fileId});
+        this.getDriveFile(fileId);
+    }
+
+    getDriveFile(fileId: string) {
+        var request = gapi.client.drive.files.get({'fileId' : fileId});
         request.execute((resp) => {
             console.log("My file: " + resp.id);
             console.log("downloadUrl: " + resp.downloadUrl);
 
-            //var headers = new Headers();
-            //headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
+            var headers = new Headers();
+            headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
             //headers.append("Access-Control-Allow-Origin", "*");
-            //this.http.get(resp.downloadUrl, {headers: headers})
-            //    .map(res => res.text())
-            //    .subscribe(
-            //        data => {
-            //            console.log("DATA: " + data);
-            //            console.log(data);
-            //        },
-            //        err => console.log(err),
-            //        () => console.log("File loaded successfully")
-            //    );
-
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = () => {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    console.log(xmlhttp.responseText);
-                    this.replaceEditorContent(xmlhttp.responseText);
-                }
-            }
-            xmlhttp.open('GET', resp.downloadUrl, true);
-            xmlhttp.setRequestHeader('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
-            xmlhttp.send();
+            this.http.get(resp.downloadUrl, {headers: headers})
+                .map(res => res.text())
+                .subscribe(
+                    data => {
+                        this.replaceEditorContent(data);
+                    },
+                    err => console.log(err),
+                    () => console.log("File loaded successfully")
+                );
         });
     }
 }
 
-///**
-// * Print files.
-// */
-//function listFiles() {
-//    var request = gapi.client.drive.files.list({
-//        'maxResults': 10
-//    });
-//
-//    request.execute(function(resp) {
-//        console.log('Files:');
-//        var files = resp.items;
-//        if (files && files.length > 0) {
-//            for (var i = 0; i < files.length; i++) {
-//                var file = files[i];
-//                console.log(file.title + ' (' + file.id + ')');
-//            }
-//        } else {
-//            console.log('No files found.');
-//        }
-//    });
-//    var fileId = "0B41ijm12hDvscEhEem9LY1JiQVU";
-//    request = gapi.client.drive.files.get({'fileId' : fileId});
-//    request.execute(function (resp) {
-//        console.log("My file: " + resp.id);
-//        console.log("WebContentLink: " + resp.webContentLink);
-//
-//        var http = new Http();
-//        http.get(resp.webContentLink)
-//            .map(res => res.text())
-//            .subscribe(
-//                data => {
-//                    console.log("DATA: " + data);
-//                },
-//                err => console.log(err),
-//                () => console.log("File loaded successfully")
-//            );
-//    });
-//}
+function getUrlParameters(param) {
+    var result = null;
+    if (param != null) {
+        var source = window.location.search,
+            map = {};
+        if ("" != source) {
+            var groups = source.substr(1).split("&"), i;
+
+            for (i in groups) {
+                i = groups[i].split("=");
+                map[decodeURIComponent(i[0])] = decodeURIComponent(i[1]);
+            }
+        }
+
+        var state = map["state"];
+        if (state != null) {
+            result = JSON.parse(state)[param];
+        }
+        console.log(result);
+    }
+    return result;
+}
 
