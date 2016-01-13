@@ -87,7 +87,8 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     this.scopes = [
                         'https://www.googleapis.com/auth/drive.metadata.readonly',
                         'https://www.googleapis.com/auth/plus.login',
-                        'https://www.googleapis.com/auth/userinfo.email'
+                        'https://www.googleapis.com/auth/userinfo.email',
+                        'https://www.googleapis.com/auth/drive.install'
                     ];
                     /**
                      * GAPI
