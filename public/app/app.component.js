@@ -85,10 +85,10 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                     this.apiKey = "AIzaSyCoRUmlrl47ty3dMkM4nk0hUK55syJkjQw";
                     this.clientId = "63791508161-k9331fs3l9gh9iqf40en16j85mnhdlli.apps.googleusercontent.com";
                     this.scopes = [
-                        'https://www.googleapis.com/auth/drive.metadata.readonly',
-                        'https://www.googleapis.com/auth/plus.login',
-                        'https://www.googleapis.com/auth/userinfo.email',
-                        'https://www.googleapis.com/auth/drive.install'
+                        'https://www.googleapis.com/auth/drive.install',
+                        'https://www.googleapis.com/auth/drive',
+                        'profile',
+                        'email'
                     ];
                     /**
                      * GAPI
@@ -177,13 +177,12 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Rx'], function(exports_
                 };
                 AppComponent.prototype.loadDriveFile = function (fileId) {
                     var _this = this;
+                    var headers = new http_1.Headers();
+                    headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
                     var request = gapi.client.drive.files.get({ 'fileId': fileId });
                     request.execute(function (resp) {
                         console.log("My file: " + resp.id);
                         console.log("downloadUrl: " + resp.downloadUrl);
-                        var headers = new http_1.Headers();
-                        headers.append('Authorization', 'Bearer ' + gapi.auth.getToken().access_token);
-                        //headers.append("Access-Control-Allow-Origin", "*");
                         _this.http.get(resp.downloadUrl, { headers: headers })
                             .map(function (res) { return res.text(); })
                             .subscribe(function (data) {
