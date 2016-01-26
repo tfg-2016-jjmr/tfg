@@ -20,6 +20,7 @@ export class MyGapi {
         'profile',
         'email'
     ];
+    fileId: string;
 
     constructor(public http:any, public headers:any) {
         console.log('class gapi constructor');
@@ -61,9 +62,11 @@ export class MyGapi {
             console.log('Coudnt get file Id');
             return;
         }
+        this.fileId = aIds[0];
+
         this.gapi.client.load('drive', 'v2',
             () => {
-                let request = this.gapi.client.drive.files.get({'fileId': aIds[0]});
+                let request = this.gapi.client.drive.files.get({'fileId': this.fileId});
                 request.execute((resp) => {
                     console.log("My file: " + resp.id);
                     console.log("downloadUrl: " + resp.downloadUrl);
@@ -85,22 +88,34 @@ export class MyGapi {
                 });
             });
     }
-    getUserInfo(userId:any) {
-        return new  Promise((resolve, reject) => {
-            let user:User;
+
+    saveFileToDrive(content: string) {
+        var request = gapi.client.request({
+            'path': '/upload/drive/v2/files/' + this.fileId,
+            'method': 'PUT',
+            'params': {'uploadType': 'media'},
+            'headers': {
+                'Content-Type': 'text/plain'
+            },
+            'body': content
+        });
+
+        request.execute(
+            (resp) => {
+                console.log('content updated');
+            }
+        );
+    }
+
+    getUserInfo(userId: any) {
+        return new Promise((resolve, reject) => {
+            let user: User;
             this.gapi.client.load('plus', 'v1').then(() => {
                 let request = this.gapi.client.plus.people.get({
                     'userId': userId
                 });
-                console.log(this);
-                //this.headers.append('Authorization', 'Bearer ' + this.gapi.auth.getToken().access_token);
-                request.execute((resp) => {
-                    console.log('ID: ' + resp.id);
-                    console.log('Display Name: ' + resp.displayName);
-                    console.log('Image URL: ' + resp.image.url);
-                    console.log('Profile URL: ' + resp.url);
-                    console.log(this);
 
+                request.execute((resp) => {
                     user = {
                         displayName: resp.displayName,
                         picture: resp.image.url
@@ -117,32 +132,24 @@ export class MyGapi {
         let result = null,
             query = window.location.search,
             map: Object = {},
-            state:string,
-            group;
+            state: string;
 
-        console.log(param);
-        console.log(query);
-
-        if (param === null || query === ''){
+        if(param === null || query === '') {
             console.log('source is empty')
             return result;
         }
 
-        let groups = query.substr(1).split("&"), i;
-        console.log(groups);
-
+        let groups: Array<string> = query.substr(1).split("&");
         for (let i in groups) {
-            //console.log(i);
-            //console.log(map);
             i = groups[i].split("=");
             map[decodeURIComponent(i[0])] = decodeURIComponent(i[1]);
         }
-        console.log(map);
+
         state = map["state"];
         if (state != null) {
             result = JSON.parse(state)[param];
         }
-        console.log(result);
+
         return result;
     }
 

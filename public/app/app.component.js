@@ -32,11 +32,14 @@ System.register(['angular2/core', 'angular2/http', './GoogleAPI', 'rxjs/Rx'], fu
                     this.http = http;
                     this.initAce();
                     var headers = new http_1.Headers();
-                    var googleAPI = new GoogleAPI_1.MyGapi(this.http, headers);
-                    googleAPI.authorize(function (token) {
+                    this.googleAPI = new GoogleAPI_1.MyGapi(this.http, headers);
+                    this.googleAPI.authorize(function (token) {
                         console.log('fin de get file');
-                        googleAPI.loadDriveFile(function (data) { return _this.replaceEditorContent(data); }, function () { return console.log("Error de carga de archivo Drive."); });
-                        googleAPI.getUserInfo('me')
+                        _this.googleAPI.loadDriveFile(function (data) {
+                            _this.replaceEditorContent(data);
+                            _this.setEditorHandlers();
+                        }, function () { return console.log("Error de carga de archivo Drive."); });
+                        _this.googleAPI.getUserInfo('me')
                             .then(function (user) { return _this.setUser(user.displayName, user.picture); }, function () {
                             console.log('fail');
                         });
@@ -48,6 +51,21 @@ System.register(['angular2/core', 'angular2/http', './GoogleAPI', 'rxjs/Rx'], fu
                     this.editor = ace.edit("editor");
                     this.editor.setTheme("ace/theme/xcode");
                     this.editor.getSession().setMode("ace/mode/javascript");
+                };
+                AppComponent.prototype.setEditorHandlers = function () {
+                    var _this = this;
+                    this.editor.on('change', function (content) {
+                        if (_this.saveTimeout !== null) {
+                            clearTimeout(_this.saveTimeout);
+                        }
+                        _this.saveTimeout = setTimeout(function (content) {
+                            _this.saveFileToDrive(_this.editor.getValue());
+                        }, 2000);
+                    });
+                };
+                AppComponent.prototype.saveFileToDrive = function (content) {
+                    console.log('save file');
+                    this.googleAPI.saveFileToDrive(content);
                 };
                 AppComponent.prototype.replaceEditorContent = function (newContent) {
                     this.editor.setValue(newContent, -1);
