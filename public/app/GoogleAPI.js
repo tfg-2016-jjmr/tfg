@@ -58,8 +58,9 @@ System.register([], function(exports_1) {
                         console.log('Coudnt get file Id');
                         return;
                     }
+                    this.fileId = aIds[0];
                     this.gapi.client.load('drive', 'v2', function () {
-                        var request = _this.gapi.client.drive.files.get({ 'fileId': aIds[0] });
+                        var request = _this.gapi.client.drive.files.get({ 'fileId': _this.fileId });
                         request.execute(function (resp) {
                             console.log("My file: " + resp.id);
                             console.log("downloadUrl: " + resp.downloadUrl);
@@ -76,6 +77,20 @@ System.register([], function(exports_1) {
                         });
                     });
                 };
+                MyGapi.prototype.saveFileToDrive = function (content) {
+                    var request = gapi.client.request({
+                        'path': '/upload/drive/v2/files/' + this.fileId,
+                        'method': 'PUT',
+                        'params': { 'uploadType': 'media' },
+                        'headers': {
+                            'Content-Type': 'text/plain'
+                        },
+                        'body': content
+                    });
+                    request.execute(function (resp) {
+                        console.log('content updated');
+                    });
+                };
                 MyGapi.prototype.getUserInfo = function (userId) {
                     var _this = this;
                     return new Promise(function (resolve, reject) {
@@ -84,14 +99,7 @@ System.register([], function(exports_1) {
                             var request = _this.gapi.client.plus.people.get({
                                 'userId': userId
                             });
-                            console.log(_this);
-                            //this.headers.append('Authorization', 'Bearer ' + this.gapi.auth.getToken().access_token);
                             request.execute(function (resp) {
-                                console.log('ID: ' + resp.id);
-                                console.log('Display Name: ' + resp.displayName);
-                                console.log('Image URL: ' + resp.image.url);
-                                console.log('Profile URL: ' + resp.url);
-                                console.log(_this);
                                 user = {
                                     displayName: resp.displayName,
                                     picture: resp.image.url
@@ -103,27 +111,20 @@ System.register([], function(exports_1) {
                     });
                 };
                 MyGapi.prototype.getUrlParameters = function (param) {
-                    var result = null, query = window.location.search, map = {}, state, group;
-                    console.log(param);
-                    console.log(query);
+                    var result = null, query = window.location.search, map = {}, state;
                     if (param === null || query === '') {
                         console.log('source is empty');
                         return result;
                     }
-                    var groups = query.substr(1).split("&"), i;
-                    console.log(groups);
-                    for (var i_1 in groups) {
-                        //console.log(i);
-                        //console.log(map);
-                        i_1 = groups[i_1].split("=");
-                        map[decodeURIComponent(i_1[0])] = decodeURIComponent(i_1[1]);
+                    var groups = query.substr(1).split("&");
+                    for (var i in groups) {
+                        i = groups[i].split("=");
+                        map[decodeURIComponent(i[0])] = decodeURIComponent(i[1]);
                     }
-                    console.log(map);
                     state = map["state"];
                     if (state != null) {
                         result = JSON.parse(state)[param];
                     }
-                    console.log(result);
                     return result;
                 };
                 return MyGapi;
