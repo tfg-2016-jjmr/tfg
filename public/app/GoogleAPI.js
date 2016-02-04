@@ -51,7 +51,7 @@ System.register([], function(exports_1) {
                 };
                 MyGapi.prototype.loadDriveFile = function (success, error) {
                     var _this = this;
-                    var aIds = this.getUrlParameters("ids");
+                    var aIds = this.getUrlParameters("ids"), file;
                     console.log('aIds');
                     console.log(aIds);
                     if (aIds === null || aIds[0] === undefined) {
@@ -64,6 +64,8 @@ System.register([], function(exports_1) {
                         request.execute(function (resp) {
                             console.log("My file: " + resp.id);
                             console.log("downloadUrl: " + resp.downloadUrl);
+                            console.log(resp);
+                            file = resp;
                             //this.headers = new Headers();
                             console.log(_this.gapi.auth.getToken());
                             _this.headers.append('Authorization', 'Bearer ' + _this.gapi.auth.getToken().access_token);
@@ -72,7 +74,8 @@ System.register([], function(exports_1) {
                                 .subscribe(function (data) {
                                 console.log('fileLoaded');
                                 //console.log(data);
-                                success(data);
+                                file["content"] = data;
+                                success(file);
                             }, function (err) { return console.log(err); }, function () { return console.log("File loaded successfully"); });
                         });
                     });
@@ -112,11 +115,14 @@ System.register([], function(exports_1) {
                 };
                 MyGapi.prototype.getUrlParameters = function (param) {
                     var result = null, query = window.location.search, map = {}, state;
+                    console.log("param: " + param);
+                    console.log('query: ' + query);
                     if (param === null || query === '') {
                         console.log('source is empty');
                         return result;
                     }
                     var groups = query.substr(1).split("&");
+                    console.log(groups);
                     for (var i in groups) {
                         i = groups[i].split("=");
                         map[decodeURIComponent(i[0])] = decodeURIComponent(i[1]);
@@ -125,7 +131,7 @@ System.register([], function(exports_1) {
                     if (state != null) {
                         result = JSON.parse(state)[param];
                     }
-                    return result;
+                    return result || JSON.parse(state)['exportIds'];
                 };
                 return MyGapi;
             })();

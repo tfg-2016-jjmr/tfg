@@ -30,27 +30,36 @@ System.register(['angular2/core', 'angular2/http', './GoogleAPI', 'rxjs/Rx'], fu
                 function AppComponent(http) {
                     var _this = this;
                     this.http = http;
+                    this.loaded = false;
+                    $('body').removeClass('unresolved');
                     this.initAce();
                     var headers = new http_1.Headers();
                     this.googleAPI = new GoogleAPI_1.MyGapi(this.http, headers);
                     this.googleAPI.authorize(function (token) {
                         console.log('fin de get file');
-                        _this.googleAPI.loadDriveFile(function (data) {
-                            _this.replaceEditorContent(data);
+                        _this.googleAPI.loadDriveFile(function (file) {
+                            // console.log(file);
+                            _this.fileName = file.originalFilename;
+                            _this.fileExtension = file.fileExtension;
+                            _this.replaceEditorContent(file.content);
                             _this.setEditorHandlers();
                         }, function () { return console.log("Error de carga de archivo Drive."); });
                         _this.googleAPI.getUserInfo('me')
                             .then(function (user) { return _this.setUser(user.displayName, user.picture); }, function () {
-                            console.log('fail');
+                            console.log('fail loading ');
                         });
+                        _this.loaded = true;
                     }, function (err) {
                         console.log(err);
+                        _this.loaded = true;
                     });
                 }
                 AppComponent.prototype.initAce = function () {
                     this.editor = ace.edit("editor");
                     this.editor.setTheme("ace/theme/xcode");
-                    this.editor.getSession().setMode("ace/mode/javascript");
+                    // this.editor.getSession().setMode("ace/mode/javascript");
+                    // Disable sintax error
+                    this.editor.getSession().setUseWorker(false);
                 };
                 AppComponent.prototype.setEditorHandlers = function () {
                     var _this = this;

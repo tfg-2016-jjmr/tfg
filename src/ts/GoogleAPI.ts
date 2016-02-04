@@ -55,7 +55,9 @@ export class MyGapi {
 
 
     loadDriveFile(success:(data: any) => void, error:(err: any) => void) {
-        let aIds = this.getUrlParameters("ids");
+        let aIds = this.getUrlParameters("ids"),
+            file: Object;
+            
         console.log('aIds');
         console.log(aIds);
         if (aIds === null || aIds[0] === undefined){
@@ -70,17 +72,19 @@ export class MyGapi {
                 request.execute((resp) => {
                     console.log("My file: " + resp.id);
                     console.log("downloadUrl: " + resp.downloadUrl);
-
+                    console.log(resp);
+                    file = resp;
                     //this.headers = new Headers();
                     console.log(this.gapi.auth.getToken());
                     this.headers.append('Authorization', 'Bearer ' + this.gapi.auth.getToken().access_token);
                     this.http.get(resp.downloadUrl, {headers: this.headers})
                         .map(res => res.text())
                         .subscribe(
-                            data => {
-                                console.log('fileLoaded');
-                                //console.log(data);
-                                success(data);
+                        data => {
+                            console.log('fileLoaded');
+                            //console.log(data);
+                                file["content"] = data;
+                                success(file);
                             },
                             err => console.log(err),
                             () => console.log("File loaded successfully")
@@ -133,13 +137,15 @@ export class MyGapi {
             query = window.location.search,
             map: Object = {},
             state: string;
-
+        console.log("param: " + param);
+        console.log('query: ' + query);
         if(param === null || query === '') {
             console.log('source is empty')
             return result;
         }
 
         let groups: Array<string> = query.substr(1).split("&");
+        console.log(groups);
         for (let i in groups) {
             i = groups[i].split("=");
             map[decodeURIComponent(i[0])] = decodeURIComponent(i[1]);
@@ -150,7 +156,7 @@ export class MyGapi {
             result = JSON.parse(state)[param];
         }
 
-        return result;
+        return result || JSON.parse(state)['exportIds'];
     }
 
 
