@@ -4,5 +4,6 @@
 import {bootstrap} from 'angular2/platform/browser'
 import {AppComponent} from './app.component'
 import {Http, HTTP_PROVIDERS, Response, Request} from 'angular2/http';
+import {LanguageService} from './language.service';
 
-bootstrap(AppComponent, [HTTP_PROVIDERS]);
+bootstrap(AppComponent, [HTTP_PROVIDERS, LanguageService]);

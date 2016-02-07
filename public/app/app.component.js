@@ -1,7 +1,7 @@
 /**
  * Created by mrivero on 27/12/2015.
  */
-System.register(['angular2/core', 'angular2/http', './GoogleAPI', 'rxjs/Rx'], function(exports_1) {
+System.register(['angular2/core', 'angular2/http', './language.service', './GoogleAPI', 'rxjs/Rx'], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -11,7 +11,7 @@ System.register(['angular2/core', 'angular2/http', './GoogleAPI', 'rxjs/Rx'], fu
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1, GoogleAPI_1;
+    var core_1, http_1, language_service_1, GoogleAPI_1;
     var AppComponent;
     return {
         setters:[
@@ -21,17 +21,38 @@ System.register(['angular2/core', 'angular2/http', './GoogleAPI', 'rxjs/Rx'], fu
             function (http_1_1) {
                 http_1 = http_1_1;
             },
+            function (language_service_1_1) {
+                language_service_1 = language_service_1_1;
+            },
             function (GoogleAPI_1_1) {
                 GoogleAPI_1 = GoogleAPI_1_1;
             },
             function (_1) {}],
         execute: function() {
             AppComponent = (function () {
-                function AppComponent(http) {
+                function AppComponent(http, _languageService) {
                     var _this = this;
                     this.http = http;
+                    this._languageService = _languageService;
                     this.loaded = false;
                     $('body').removeClass('unresolved');
+                    this.http.get('/api/configuration')
+                        .map(function (res) { return res.json(); })
+                        .subscribe(function (data) {
+                        console.log('success getting config');
+                        console.log(data);
+                    }, function (err) {
+                        console.log('error getting config');
+                        console.log(err);
+                    });
+                    this._languageService.getLanguage('/ideas-sedl-language')
+                        .subscribe(function (data) {
+                        console.log('success getting sedl language');
+                        console.log(data);
+                    }, function (err) {
+                        console.log('error getting sedl language');
+                        console.log(err);
+                    });
                     this.initAce();
                     var headers = new http_1.Headers();
                     this.googleAPI = new GoogleAPI_1.MyGapi(this.http, headers);
@@ -90,7 +111,7 @@ System.register(['angular2/core', 'angular2/http', './GoogleAPI', 'rxjs/Rx'], fu
                         selector: 'app',
                         templateUrl: 'templates/app.html',
                     }), 
-                    __metadata('design:paramtypes', [http_1.Http])
+                    __metadata('design:paramtypes', [http_1.Http, language_service_1.LanguageService])
                 ], AppComponent);
                 return AppComponent;
             })();

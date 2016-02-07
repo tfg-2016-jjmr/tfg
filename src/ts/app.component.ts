@@ -8,9 +8,13 @@
 
 import {Component, View} from 'angular2/core';
 import {Http, HTTP_PROVIDERS, Response, Request, Headers} from 'angular2/http';
-import {MockBackend} from 'angular2/http/testing';
+import {LanguageService} from './language.service';
 import {MyGapi, User} from './GoogleAPI';
 import 'rxjs/Rx';
+import { IConfiguration, ILanguage, IFormat, IOperation} from './interfaces';
+
+
+
 
 @Component({
     selector: 'app',
@@ -24,9 +28,35 @@ export class AppComponent {
     fileName: string;
     fileExtension: string;
     loaded: boolean = false;
+    configuration: Object;
 
-    constructor(public http: Http) {
+    constructor(public http: Http, private _languageService: LanguageService) {
         $('body').removeClass('unresolved');
+
+        this.http.get('/api/configuration')
+            .map(res => res.json())
+            .subscribe(
+                (data) => {
+                    console.log('success getting config');
+                    console.log(data)
+                },
+                (err) => {
+                    console.log('error getting config');
+                    console.log(err);
+                });
+        
+        this._languageService.getLanguage('/ideas-sedl-language')
+            .subscribe(
+                (data) => {
+                    console.log('success getting sedl language');
+                    console.log(data)
+                },
+                (err) => {
+                    console.log('error getting sedl language');
+                    console.log(err);
+                });
+
+
         this.initAce();
         let headers = new Headers();
         this.googleAPI = new MyGapi(this.http, headers);
@@ -45,18 +75,20 @@ export class AppComponent {
                 );
                 this.googleAPI.getUserInfo('me')
                     .then(
-                        (user: User) => this.setUser(user.displayName, user.picture),
-                        ()=>{
-                            console.log('fail loading ')
-                        }
+                    (user: User) => this.setUser(user.displayName, user.picture),
+                    () => {
+                        console.log('fail loading ')
+                    }
                     );
-                    
-                 this.loaded = true;
+
+                this.loaded = true;
             },
             (err) => {
                 console.log(err);
                 this.loaded = true;
             });
+
+
     }
 
     initAce() {
@@ -69,7 +101,7 @@ export class AppComponent {
 
     setEditorHandlers() {
         this.editor.on('change', (content) => {
-            if(this.saveTimeout !== null){
+            if (this.saveTimeout !== null) {
                 clearTimeout(this.saveTimeout);
             }
 
@@ -77,7 +109,7 @@ export class AppComponent {
                 (content) => {
                     this.saveFileToDrive(this.editor.getValue());
                 }
-                ,2000);
+                , 2000);
         });
     }
 
