@@ -57,14 +57,19 @@ export class MyGapi {
     loadDriveFile(success:(data: any) => void, error:(err: any) => void) {
         let aIds = this.getUrlParameters("ids"),
             file: Object;
-            
-        console.log('aIds');
+
+
         console.log(aIds);
         if (aIds === null || aIds[0] === undefined){
             console.log('Coudnt get file Id');
             return;
         }
-        this.fileId = aIds[0];
+
+        if (typeof aIds == 'string') {
+            this.fileId = aIds;
+        } else if (typeof aIds == 'object') {
+            this.fileId = aIds[0];
+        }
 
         this.gapi.client.load('drive', 'v2',
             () => {
@@ -150,13 +155,16 @@ export class MyGapi {
             i = groups[i].split("=");
             map[decodeURIComponent(i[0])] = decodeURIComponent(i[1]);
         }
-
-        state = map["state"];
-        if (state != null) {
-            result = JSON.parse(state)[param];
+        if (map != null) {
+            var value = map[param];
+            try{
+                result=JSON.parse(value);
+            }catch(e){
+                result = value;
+            }
         }
-
-        return result || JSON.parse(state)['exportIds'];
+        console.log(result);
+        return result;
     }
 
 
