@@ -27,10 +27,9 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                     this.http = http;
                     this._baserURL = 'https://labs.isa.us.es:8181';
                 }
-                LanguageService.prototype.getLanguage = function (languageId) {
-                    return this.http.get('/api/language' + languageId)
+                LanguageService.prototype.getLanguage = function (languagePath) {
+                    return this.http.get('/api/language' + languagePath)
                         .map(function (res) { return res.json(); })
-                        .do(function (data) { return console.log(data); }) // eyeball results in the console
                         .catch(this.handleError);
                 };
                 LanguageService.prototype.handleError = function (error) {

@@ -28,34 +28,40 @@ export class AppComponent {
     fileName: string;
     fileExtension: string;
     loaded: boolean = false;
-    configuration: Object;
+    configuration: IConfiguration;
+    languages: { [key:string]: ILanguage };
+    selectedFormat: string;
 
     constructor(public http: Http, private _languageService: LanguageService) {
         $('body').removeClass('unresolved');
-
+	    
+        this.languages = {};
+         
         this.http.get('/api/configuration')
             .map(res => res.json())
             .subscribe(
-                (data) => {
-                    console.log('success getting config');
-                    console.log(data)
-                },
-                (err) => {
-                    console.log('error getting config');
-                    console.log(err);
-                });
-        
-        this._languageService.getLanguage('/ideas-sedl-language')
-            .subscribe(
-                (data) => {
-                    console.log('success getting sedl language');
-                    console.log(data)
-                },
-                (err) => {
-                    console.log('error getting sedl language');
-                    console.log(err);
-                });
+            (data) => {
+                console.log(data);
+                this.configuration = data;
 
+                $.each(this.configuration.languages, (languageId, languagePath) => {
+                    this._languageService.getLanguage(languagePath)
+                        .subscribe(
+                        (lang: ILanguage) => {
+                            console.log(lang);
+                            this.languages[lang.extension] = lang;
+                            console.log(this.languages)
+                        },
+                        (err) => {
+                            console.log(err);
+                        });
+                });
+            },
+            (err) => {
+                console.log(err);
+            });
+
+        console.log(this.languages);
 
         this.initAce();
         let headers = new Headers();
@@ -70,6 +76,7 @@ export class AppComponent {
                         this.fileExtension = file.fileExtension;
                         this.replaceEditorContent(file.content);
                         this.setEditorHandlers();
+                        this.setEditorParameters();
                     },
                     () => console.log("Error de carga de archivo Drive.")
                 );
@@ -87,8 +94,6 @@ export class AppComponent {
                 console.log(err);
                 this.loaded = true;
             });
-
-
     }
 
     initAce() {
@@ -120,6 +125,15 @@ export class AppComponent {
 
     replaceEditorContent(newContent: string) {
         this.editor.setValue(newContent, -1);
+    }
+
+    setEditorParameters(){
+        let selectedFormat= this.languages[this.fileExtension].formats[0];
+
+        if(selectedFormat.editorThemeId)
+            this.editor.setTheme(selectedFormat.editorThemeId);
+        if(selectedFormat.editorModeId)
+            this.editor.getSession().setMode(selectedFormat.editorModeId);
     }
 
     setUser(displayname: string, picture: string) {

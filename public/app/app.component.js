@@ -36,23 +36,26 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
                     this._languageService = _languageService;
                     this.loaded = false;
                     $('body').removeClass('unresolved');
+                    this.languages = {};
                     this.http.get('/api/configuration')
                         .map(function (res) { return res.json(); })
                         .subscribe(function (data) {
-                        console.log('success getting config');
                         console.log(data);
+                        _this.configuration = data;
+                        $.each(_this.configuration.languages, function (languageId, languagePath) {
+                            _this._languageService.getLanguage(languagePath)
+                                .subscribe(function (lang) {
+                                console.log(lang);
+                                _this.languages[lang.extension] = lang;
+                                console.log(_this.languages);
+                            }, function (err) {
+                                console.log(err);
+                            });
+                        });
                     }, function (err) {
-                        console.log('error getting config');
                         console.log(err);
                     });
-                    this._languageService.getLanguage('/ideas-sedl-language')
-                        .subscribe(function (data) {
-                        console.log('success getting sedl language');
-                        console.log(data);
-                    }, function (err) {
-                        console.log('error getting sedl language');
-                        console.log(err);
-                    });
+                    console.log(this.languages);
                     this.initAce();
                     var headers = new http_1.Headers();
                     this.googleAPI = new GoogleAPI_1.MyGapi(this.http, headers);
@@ -64,6 +67,7 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
                             _this.fileExtension = file.fileExtension;
                             _this.replaceEditorContent(file.content);
                             _this.setEditorHandlers();
+                            _this.setEditorParameters();
                         }, function () { return console.log("Error de carga de archivo Drive."); });
                         _this.googleAPI.getUserInfo('me')
                             .then(function (user) { return _this.setUser(user.displayName, user.picture); }, function () {
@@ -99,6 +103,13 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
                 };
                 AppComponent.prototype.replaceEditorContent = function (newContent) {
                     this.editor.setValue(newContent, -1);
+                };
+                AppComponent.prototype.setEditorParameters = function () {
+                    var selectedFormat = this.languages[this.fileExtension].formats[0];
+                    if (selectedFormat.editorThemeId)
+                        this.editor.setTheme(selectedFormat.editorThemeId);
+                    if (selectedFormat.editorModeId)
+                        this.editor.getSession().setMode(selectedFormat.editorModeId);
                 };
                 AppComponent.prototype.setUser = function (displayname, picture) {
                     this.user = {

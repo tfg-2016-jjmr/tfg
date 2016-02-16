@@ -11,10 +11,10 @@ export class LanguageService {
 
     constructor(public http: Http) { }
 
-    getLanguage(languageId: string){
-        return this.http.get('/api/language' + languageId)
+    getLanguage(languagePath: string){
+        return this.http.get('/api/language' + languagePath)
             .map((res) => <ILanguage> res.json())
-            .do(data => console.log(data)) // eyeball results in the console
+            // .do(data => console.log(data)) // eyeball results in the console
             .catch(this.handleError);
             
     }

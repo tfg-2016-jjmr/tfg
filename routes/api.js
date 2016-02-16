@@ -46,15 +46,15 @@ router.get('/configuration', function(req, res, next) {
     res.json(oJSON);
 });
 
-router.get('/language/:id', function(req, res, next) {
-    var langURL = ideasURL + req.params.id + "/language",
+router.get('/language/:languagePath', function(req, res, next) {
+    var langURL = ideasURL + req.params.languagePath + "/language",
 		result;
         console.log(langURL);
 
 	var options = {
 		host: 'labs.isa.us.es',
 		port: 8181,
-		path: '/' + req.params.id + "/language",
+		path: '/' + req.params.languagePath+ "/language",
 		method: 'GET',
 		rejectUnauthorized: false
 	};
