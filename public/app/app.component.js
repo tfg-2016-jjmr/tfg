@@ -36,52 +36,98 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
                     this._languageService = _languageService;
                     this.loaded = false;
                     $('body').removeClass('unresolved');
+                    var languagesDef = $.Deferred(), aLanDef = [];
                     this.languages = {};
-                    this.http.get('/api/configuration')
-                        .map(function (res) { return res.json(); })
-                        .subscribe(function (data) {
-                        console.log(data);
-                        _this.configuration = data;
-                        $.each(_this.configuration.languages, function (languageId, languagePath) {
-                            _this._languageService.getLanguage(languagePath)
-                                .subscribe(function (lang) {
-                                console.log(lang);
-                                _this.languages[lang.extension] = lang;
-                                console.log(_this.languages);
+                    //this.http.get('/api/configuration')
+                    //    .map(res => res.json())
+                    //    .subscribe(
+                    //        (data) => {
+                    //            this.configuration = data;
+                    //            languagesDef.resolve();
+                    //        },
+                    //        (err) => {
+                    //            languagesDef.reject();
+                    //        }
+                    //    );
+                    //$.when(languagesDef)
+                    //    .done(() => {
+                    //        $.each(this.configuration.languages, (languageId, languagePath) => {
+                    //            let d = $.Deferred();
+                    //            this._languageService.getLanguage(languagePath)
+                    //                .subscribe(
+                    //                    (lang:ILanguage) => {
+                    //                        this.languages[lang.extension] = lang;
+                    //                        d.resolve();
+                    //                    },
+                    //                    (err) => {
+                    //                        d.reject();
+                    //                    });
+                    //            aLanDef.push(d.promise());
+                    //        });
+                    //        $.when.apply($, aLanDef)
+                    //            .done(() => console.log('se leyeron todos los lenguajes';)
+                    //            .fail(() => console.log('No se cogiron todos los lenguajes';);
+                    //    });
+                    this.initAce();
+                    Promise.all([
+                        new Promise(function (resolve, reject) {
+                            _this.http.get('/api/configuration')
+                                .map(function (res) { return res.json(); })
+                                .subscribe(function (data) {
+                                _this.configuration = data;
+                                var listo = [];
+                                $.each(_this.configuration.languages, function (languageId, languagePath) {
+                                    listo.push((function () {
+                                        var d = new Promise(function (resolve, reject) {
+                                            _this._languageService.getLanguage(languagePath)
+                                                .subscribe(function (lang) {
+                                                _this.languages[lang.extension] = lang;
+                                                resolve();
+                                            }, function (err) {
+                                                console.log(err);
+                                                reject();
+                                            });
+                                        });
+                                        return d;
+                                    })());
+                                });
+                                Promise.all(listo).then(function () { return resolve(); }, function () { return reject(); });
                             }, function (err) {
                                 console.log(err);
                             });
-                        });
-                    }, function (err) {
-                        console.log(err);
-                    });
-                    console.log(this.languages);
-                    this.initAce();
-                    var headers = new http_1.Headers();
-                    this.googleAPI = new GoogleAPI_1.MyGapi(this.http, headers);
-                    this.googleAPI.authorize(function (token) {
-                        console.log('fin de get file');
-                        _this.googleAPI.loadDriveFile(function (file) {
-                            // console.log(file);
-                            _this.fileName = file.originalFilename;
-                            _this.fileExtension = file.fileExtension;
-                            _this.replaceEditorContent(file.content);
-                            _this.setEditorHandlers();
-                            _this.setEditorParameters();
-                        }, function () { return console.log("Error de carga de archivo Drive."); });
-                        _this.googleAPI.getUserInfo('me')
-                            .then(function (user) { return _this.setUser(user.displayName, user.picture); }, function () {
-                            console.log('fail loading ');
-                        });
-                        _this.loaded = true;
-                    }, function (err) {
-                        console.log(err);
-                        _this.loaded = true;
+                        }),
+                        new Promise(function (resolve, reject) {
+                            var headers = new http_1.Headers();
+                            _this.googleAPI = new GoogleAPI_1.MyGapi(_this.http, headers);
+                            _this.googleAPI.authorize(function (token) {
+                                _this.googleAPI.loadDriveFile(function (file) {
+                                    console.log("FILE");
+                                    console.log(file);
+                                    _this.fileName = file.originalFilename;
+                                    _this.fileExtension = file.fileExtension;
+                                    _this.replaceEditorContent(file.content);
+                                    resolve();
+                                }, function () { return console.log("Error de carga de archivo Drive."); });
+                                _this.googleAPI.getUserInfo('me')
+                                    .then(function (user) { return _this.setUser(user.displayName, user.picture); }, function () {
+                                    console.log('fail loading ');
+                                });
+                                _this.loaded = true;
+                            }, function (err) {
+                                console.log(err);
+                                _this.loaded = true;
+                            });
+                        })
+                    ]).then(function () {
+                        console.log("todo listo, calisto");
+                        console.log(_this.languages);
+                        _this.setEditorHandlers();
+                        _this.setEditorParameters();
                     });
                 }
                 AppComponent.prototype.initAce = function () {
                     this.editor = ace.edit("editor");
-                    this.editor.setTheme("ace/theme/xcode");
+                    //this.editor.setTheme("ace/theme/xcode");
                     // this.editor.getSession().setMode("ace/mode/javascript");
                     // Disable sintax error
                     this.editor.getSession().setUseWorker(false);
@@ -105,11 +151,16 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
                     this.editor.setValue(newContent, -1);
                 };
                 AppComponent.prototype.setEditorParameters = function () {
+                    console.log(this.fileExtension);
                     var selectedFormat = this.languages[this.fileExtension].formats[0];
-                    if (selectedFormat.editorThemeId)
+                    if (selectedFormat.editorThemeId) {
+                        console.log(selectedFormat.editorThemeId);
                         this.editor.setTheme(selectedFormat.editorThemeId);
-                    if (selectedFormat.editorModeId)
+                    }
+                    if (selectedFormat.editorModeId) {
+                        console.log(selectedFormat.editorModeId);
                         this.editor.getSession().setMode(selectedFormat.editorModeId);
+                    }
                 };
                 AppComponent.prototype.setUser = function (displayname, picture) {
                     this.user = {

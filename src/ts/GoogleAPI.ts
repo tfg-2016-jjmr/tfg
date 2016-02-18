@@ -91,7 +91,7 @@ export class MyGapi {
                                 file["content"] = data;
                                 success(file);
                             },
-                            err => console.log(err),
+                            (err) => console.log(err),
                             () => console.log("File loaded successfully")
                         );
                 });

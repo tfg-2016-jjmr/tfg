@@ -34,71 +34,122 @@ export class AppComponent {
 
     constructor(public http: Http, private _languageService: LanguageService) {
         $('body').removeClass('unresolved');
+        let languagesDef= $.Deferred(),
+            aLanDef = [];
 	    
         this.languages = {};
-         
-        this.http.get('/api/configuration')
-            .map(res => res.json())
-            .subscribe(
-            (data) => {
-                console.log(data);
-                this.configuration = data;
 
-                $.each(this.configuration.languages, (languageId, languagePath) => {
-                    this._languageService.getLanguage(languagePath)
-                        .subscribe(
-                        (lang: ILanguage) => {
-                            console.log(lang);
-                            this.languages[lang.extension] = lang;
-                            console.log(this.languages)
+        //this.http.get('/api/configuration')
+        //    .map(res => res.json())
+        //    .subscribe(
+        //        (data) => {
+        //            this.configuration = data;
+        //            languagesDef.resolve();
+        //        },
+        //        (err) => {
+        //            languagesDef.reject();
+        //        }
+        //    );
+        //$.when(languagesDef)
+        //    .done(() => {
+        //        $.each(this.configuration.languages, (languageId, languagePath) => {
+        //            let d = $.Deferred();
+        //            this._languageService.getLanguage(languagePath)
+        //                .subscribe(
+        //                    (lang:ILanguage) => {
+        //                        this.languages[lang.extension] = lang;
+        //                        d.resolve();
+        //                    },
+        //                    (err) => {
+        //                        d.reject();
+        //                    });
+        //            aLanDef.push(d.promise());
+        //        });
+        //        $.when.apply($, aLanDef)
+        //            .done(() => console.log('se leyeron todos los lenguajes';)
+        //            .fail(() => console.log('No se cogiron todos los lenguajes';);
+        //    });
+
+
+        this.initAce();
+
+        Promise.all([
+            new Promise ((resolve, reject) => {
+                this.http.get('/api/configuration')
+                    .map(res => res.json())
+                    .subscribe(
+                        (data) => {
+                            this.configuration = data;
+                            let listo = [];
+                            $.each(this.configuration.languages, (languageId, languagePath) => {
+                                listo.push((() => {
+                                    let d = new Promise((resolve, reject) => {
+                                        this._languageService.getLanguage(languagePath)
+                                            .subscribe(
+                                                (lang:ILanguage) => {
+                                                    this.languages[lang.extension] = lang;
+                                                    resolve();
+                                                },
+                                                (err) => {
+                                                    console.log(err);
+                                                    reject();
+                                                });
+                                    });
+                                    return d;
+                                })());
+
+                            });
+
+                            Promise.all(listo).then(() => resolve(), ()=> reject());
                         },
                         (err) => {
                             console.log(err);
-                        });
-                });
-            },
-            (err) => {
-                console.log(err);
-            });
+                        })
+                }),
+            new Promise((resolve, reject) => {
+                let headers = new Headers();
+                this.googleAPI = new MyGapi(this.http, headers);
+                this.googleAPI.authorize(
+                    (token) => {
+                        this.googleAPI.loadDriveFile(
+                            (file) => {
+                                console.log("FILE");
+                                console.log(file);
+                                this.fileName = file.originalFilename;
+                                this.fileExtension = file.fileExtension;
+                                this.replaceEditorContent(file.content);
+                                resolve();
+                            },
+                            () => console.log("Error de carga de archivo Drive.")
+                        );
+                        this.googleAPI.getUserInfo('me')
+                            .then(
+                                (user:User) => this.setUser(user.displayName, user.picture),
+                                () => {
+                                    console.log('fail loading ')
+                                }
+                            );
 
-        console.log(this.languages);
-
-        this.initAce();
-        let headers = new Headers();
-        this.googleAPI = new MyGapi(this.http, headers);
-        this.googleAPI.authorize(
-            (token) => {
-                console.log('fin de get file');
-                this.googleAPI.loadDriveFile(
-                    (file) => {
-                        // console.log(file);
-                        this.fileName = file.originalFilename;
-                        this.fileExtension = file.fileExtension;
-                        this.replaceEditorContent(file.content);
-                        this.setEditorHandlers();
-                        this.setEditorParameters();
+                        this.loaded = true;
                     },
-                    () => console.log("Error de carga de archivo Drive.")
-                );
-                this.googleAPI.getUserInfo('me')
-                    .then(
-                    (user: User) => this.setUser(user.displayName, user.picture),
-                    () => {
-                        console.log('fail loading ')
-                    }
-                    );
+                    (err) => {
+                        console.log(err);
+                        this.loaded = true;
+                    });
+            })
+        ]).then(() => {
+            console.log("todo listo, calisto");
+            console.log(this.languages);
+            this.setEditorHandlers();
+            this.setEditorParameters();
+        });
 
-                this.loaded = true;
-            },
-            (err) => {
-                console.log(err);
-                this.loaded = true;
-            });
+
     }
 
     initAce() {
         this.editor = ace.edit("editor");
-        this.editor.setTheme("ace/theme/xcode");
+        //this.editor.setTheme("ace/theme/xcode");
         // this.editor.getSession().setMode("ace/mode/javascript");
         // Disable sintax error
         this.editor.getSession().setUseWorker(false);
@@ -128,12 +179,17 @@ export class AppComponent {
     }
 
     setEditorParameters(){
+        console.log(this.fileExtension);
         let selectedFormat= this.languages[this.fileExtension].formats[0];
 
-        if(selectedFormat.editorThemeId)
+        if(selectedFormat.editorThemeId){
+            console.log(selectedFormat.editorThemeId)
             this.editor.setTheme(selectedFormat.editorThemeId);
-        if(selectedFormat.editorModeId)
+        }
+        if(selectedFormat.editorModeId){
+            console.log(selectedFormat.editorModeId);
             this.editor.getSession().setMode(selectedFormat.editorModeId);
+        }
     }
 
     setUser(displayname: string, picture: string) {

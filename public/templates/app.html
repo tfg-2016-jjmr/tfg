@@ -1,6 +1,6 @@
 <nav class="light-blue">
 	<div class="nav-wrapper">
-		<a href="#!" class="brand-logo">Governify: {{ fileName }}</a>
+		<a href="#!" class="brand-logo">{{ fileName }}</a>
 		<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 		<ul class="right hide-on-med-and-down" *ngIf="user" >
 			<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
@@ -18,6 +18,15 @@
 		</ul>
 	</div>
 </nav>
+<!--<div class="row light-blue" id="toolbar">-->
+	<!--<div class="col s12 right light-blue">-->
+		<!--<ul class="tabs">-->
+			<!--&lt;!&ndash;<li *ngFor="#format of language" class="tab col s2"><a href="#">{{ format.extension }}</a></li>&ndash;&gt;-->
+			<!--<li class="tab col s6 light-blue"><a href="#" class="active">qwerty</a></li>-->
+			<!--<li class="tab col s6 light-blue"><a href="#">asdfd</a></li>-->
+		<!--</ul>-->
+	<!--</div>-->
+<!--</div>-->
 <div class="progress light-blue" style="margin:0;" *ngIf="!loaded">
 	<div class="indeterminate white"></div>
 </div>
