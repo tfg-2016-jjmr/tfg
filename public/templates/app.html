@@ -1,33 +1,38 @@
-<nav class="light-blue">
-	<div class="nav-wrapper">
-		<a href="#!" class="brand-logo">{{ fileName }}</a>
-		<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-		<ul class="right hide-on-med-and-down" *ngIf="user" >
-			<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
-			<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
-			<!--<li><img src="/images/apple.png" class="left circle icon-32"></img></li>-->
-			<li>
-				<div class="chip">
-					<img src="{{ user.picture }}" alt="Contact Person">
-					{{ user.displayName }}
-				</div>
-			</li>
-		</ul>
-		<ul class="side-nav" id="mobile-demo">
-			<li><a href="#">Mobile</a></li>
-		</ul>
-	</div>
-</nav>
-<!--<div class="row light-blue" id="toolbar">-->
-	<!--<div class="col s12 right light-blue">-->
-		<!--<ul class="tabs">-->
-			<!--&lt;!&ndash;<li *ngFor="#format of language" class="tab col s2"><a href="#">{{ format.extension }}</a></li>&ndash;&gt;-->
-			<!--<li class="tab col s6 light-blue"><a href="#" class="active">qwerty</a></li>-->
-			<!--<li class="tab col s6 light-blue"><a href="#">asdfd</a></li>-->
-		<!--</ul>-->
-	<!--</div>-->
-<!--</div>-->
+<div class="wrapper">
+	<nav class="blue darken-2">
+		<div class="nav-wrapper">
+			<a href="#!" class="brand-logo">{{ fileName }}</a>
+			<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+			<ul class="right hide-on-med-and-down" *ngIf="user" >
+				<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
+				<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
+				<!--<li><img src="/images/apple.png" class="left circle icon-32"></img></li>-->
+				<li>
+					<!--<div class="chip">-->
+						<!--<img src="{{ user.picture }}" alt="Contact Person">-->
+						<!--{{ user.displayName }}-->
+					<!--</div>-->
+
+					<div class="user-wrapper">
+						<div class="user-info">
+							{{ user.email }}
+						</div>
+						<img src="{{ user.picture }}" alt="Contact Person">
+					</div>
+				</li>
+			</ul>
+			<ul class="side-nav" id="mobile-demo">
+				<li><a href="#">Mobile</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<tabs *ngIf="loaded" [tabs]="extensions" (selectedTab)='selectedFormat' ></tabs>
+</div>
+
 <div class="progress light-blue" style="margin:0;" *ngIf="!loaded">
 	<div class="indeterminate white"></div>
 </div>
-<div id="editor"></div> 
+
+<editor [id]="fileId" [format]="selectedFormat"></editor>
+<!--<div id="editor"></div>-->

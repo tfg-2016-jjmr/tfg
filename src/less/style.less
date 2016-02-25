@@ -14,9 +14,14 @@ body{
 h1 {
     color: @naviblue;
 }
+
+.wrapper{
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+}
 #editor {
+    //z-index: -1;
     position: relative;
-    height: ~"calc(100% - 64px)";
+    height: ~"calc(100% - 112px )";
     //height: ~"calc(100% - 64px - 48px)";
     //position: absolute;
     //top: 64px;
@@ -33,7 +38,67 @@ nav {
     .nav-wrapper > a{
         color: #ffffff;
     }
+
+    .brand-logo{
+        font-size: 24px;
+    }
+
     padding: 0 24px;
+    //height: 56px;
+
+    .user-wrapper{
+        box-sizing: inherit;
+
+        display: inline-block;
+        height: 32px;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(0,0,0,0.6);
+        line-height: 32px;
+        padding: 16px 12px;
+        //margin: 16px;
+
+        .user-info{
+            .vertical-align();
+            display: inline-block;
+            font-weight: normal;
+
+            color: #ffffff;
+            font-size: 13px;
+            line-height: 16px;
+            max-width: 100%;
+            opacity: .7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: opacity .2s;
+            white-space: nowrap;
+        }
+        img{
+            border-radius: 50%;
+            height: 32px;
+            width: 32px;
+        }
+    }
+
+}
+#toolbar{
+    margin-bottom: 0;
+    //height: 48px;
+
+    .tabs .indicator{
+        background-color: #ffffff;
+    }
+    li a{
+        color: #BCE0FC;
+        font: 500 14px/48px Roboto,sans-serif;
+
+        &:hover,
+        &.active{
+            color: #ffffff;
+        }
+    }
+
+
 }
 #loader{
     .vertical-align();

@@ -79,7 +79,7 @@ System.register([], function(exports_1) {
                                 console.log('fileLoaded');
                                 //console.log(data);
                                 file["content"] = data;
-                                success(file);
+                                success(resp.id, file);
                             }, function (err) { return console.log(err); }, function () { return console.log("File loaded successfully"); });
                         });
                     });
@@ -107,7 +107,10 @@ System.register([], function(exports_1) {
                                 'userId': userId
                             });
                             request.execute(function (resp) {
+                                console.log('user');
+                                console.log(resp);
                                 user = {
+                                    email: resp.emails[0].value,
                                     displayName: resp.displayName,
                                     picture: resp.image.url
                                 };

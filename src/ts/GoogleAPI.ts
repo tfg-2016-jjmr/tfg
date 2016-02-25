@@ -5,6 +5,7 @@
 /// <reference path="./d/gapi.d.ts" />
 
 export interface User {
+    email: string;
     displayName: string;
     picture?: string;
 }
@@ -54,7 +55,7 @@ export class MyGapi {
     }
 
 
-    loadDriveFile(success:(data: any) => void, error:(err: any) => void) {
+    loadDriveFile(success:(id: string, data: any) => void, error:(err: any) => void) {
         let aIds = this.getUrlParameters("ids"),
             file: Object;
 
@@ -89,7 +90,7 @@ export class MyGapi {
                             console.log('fileLoaded');
                             //console.log(data);
                                 file["content"] = data;
-                                success(file);
+                                success(resp.id, file);
                             },
                             (err) => console.log(err),
                             () => console.log("File loaded successfully")
@@ -125,7 +126,10 @@ export class MyGapi {
                 });
 
                 request.execute((resp) => {
+                    console.log('user');
+                    console.log(resp);
                     user = {
+                        email: resp.emails[0].value,
                         displayName: resp.displayName,
                         picture: resp.image.url
                     };

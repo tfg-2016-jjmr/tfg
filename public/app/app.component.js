@@ -1,7 +1,7 @@
 /**
  * Created by mrivero on 27/12/2015.
  */
-System.register(['angular2/core', 'angular2/http', './language.service', './GoogleAPI', 'rxjs/Rx'], function(exports_1) {
+System.register(['angular2/core', 'angular2/http', './language.service', './GoogleAPI', 'rxjs/Rx', './components/tabs', './components/editor'], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -11,7 +11,7 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1, language_service_1, GoogleAPI_1;
+    var core_1, http_1, language_service_1, GoogleAPI_1, tabs_1, editor_1;
     var AppComponent;
     return {
         setters:[
@@ -27,110 +27,108 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
             function (GoogleAPI_1_1) {
                 GoogleAPI_1 = GoogleAPI_1_1;
             },
-            function (_1) {}],
+            function (_1) {},
+            function (tabs_1_1) {
+                tabs_1 = tabs_1_1;
+            },
+            function (editor_1_1) {
+                editor_1 = editor_1_1;
+            }],
         execute: function() {
             AppComponent = (function () {
                 function AppComponent(http, _languageService) {
                     var _this = this;
                     this.http = http;
                     this._languageService = _languageService;
+                    this.fileId = '';
                     this.loaded = false;
+                    this.extensions = [''];
                     $('body').removeClass('unresolved');
                     var languagesDef = $.Deferred(), aLanDef = [];
                     this.languages = {};
-                    //this.http.get('/api/configuration')
-                    //    .map(res => res.json())
-                    //    .subscribe(
-                    //        (data) => {
-                    //            this.configuration = data;
-                    //            languagesDef.resolve();
-                    //        },
-                    //        (err) => {
-                    //            languagesDef.reject();
-                    //        }
-                    //    );
-                    //$.when(languagesDef)
-                    //    .done(() => {
-                    //        $.each(this.configuration.languages, (languageId, languagePath) => {
-                    //            let d = $.Deferred();
-                    //            this._languageService.getLanguage(languagePath)
-                    //                .subscribe(
-                    //                    (lang:ILanguage) => {
-                    //                        this.languages[lang.extension] = lang;
-                    //                        d.resolve();
-                    //                    },
-                    //                    (err) => {
-                    //                        d.reject();
-                    //                    });
-                    //            aLanDef.push(d.promise());
-                    //        });
-                    //        $.when.apply($, aLanDef)
-                    //            .done(() => console.log('se leyeron todos los lenguajes';)
-                    //            .fail(() => console.log('No se cogiron todos los lenguajes';);
-                    //    });
                     this.initAce();
-                    Promise.all([
-                        new Promise(function (resolve, reject) {
-                            _this.http.get('/api/configuration')
-                                .map(function (res) { return res.json(); })
-                                .subscribe(function (data) {
-                                _this.configuration = data;
-                                var listo = [];
-                                $.each(_this.configuration.languages, function (languageId, languagePath) {
-                                    listo.push((function () {
-                                        var d = new Promise(function (resolve, reject) {
-                                            _this._languageService.getLanguage(languagePath)
-                                                .subscribe(function (lang) {
-                                                _this.languages[lang.extension] = lang;
-                                                resolve();
-                                            }, function (err) {
-                                                console.log(err);
-                                                reject();
-                                            });
+                    var getConfigLang = new Promise(function (resolve, reject) {
+                        _this.http.get('/api/configuration')
+                            .map(function (res) { return res.json(); })
+                            .subscribe(function (data) {
+                            _this.configuration = data;
+                            var aLenguagesDeferred = [];
+                            $.each(_this.configuration.languages, function (languageId, languagePath) {
+                                aLenguagesDeferred.push((function () {
+                                    var d = new Promise(function (resolve, reject) {
+                                        _this._languageService.getLanguage(languagePath)
+                                            .subscribe(function (lang) {
+                                            _this.languages[lang.extension] = lang;
+                                            resolve();
+                                        }, function (err) {
+                                            console.log(err);
+                                            reject();
                                         });
-                                        return d;
-                                    })());
-                                });
-                                Promise.all(listo).then(function () { return resolve(); }, function () { return reject(); });
-                            }, function (err) {
-                                console.log(err);
+                                    });
+                                    return d;
+                                })());
                             });
-                        }),
-                        new Promise(function (resolve, reject) {
-                            var headers = new http_1.Headers();
-                            _this.googleAPI = new GoogleAPI_1.MyGapi(_this.http, headers);
-                            _this.googleAPI.authorize(function (token) {
-                                _this.googleAPI.loadDriveFile(function (file) {
-                                    console.log("FILE");
-                                    console.log(file);
-                                    _this.fileName = file.originalFilename;
-                                    _this.fileExtension = file.fileExtension;
-                                    _this.replaceEditorContent(file.content);
-                                    resolve();
-                                }, function () { return console.log("Error de carga de archivo Drive."); });
-                                _this.googleAPI.getUserInfo('me')
-                                    .then(function (user) { return _this.setUser(user.displayName, user.picture); }, function () {
-                                    console.log('fail loading ');
-                                });
-                                _this.loaded = true;
-                            }, function (err) {
-                                console.log(err);
-                                _this.loaded = true;
+                            Promise.all(aLenguagesDeferred).then(function () { return resolve(); }, function () { return reject(); });
+                        }, function (err) {
+                            console.log(err);
+                        });
+                    });
+                    var loadContent = new Promise(function (resolve, reject) {
+                        var headers = new http_1.Headers();
+                        _this.googleAPI = new GoogleAPI_1.MyGapi(_this.http, headers);
+                        _this.googleAPI.authorize(function (token) {
+                            _this.googleAPI.loadDriveFile(function (id, file) {
+                                console.log("FILE");
+                                console.log(file);
+                                _this.fileId = id;
+                                _this.fileName = file.originalFilename;
+                                _this.fileExtension = file.fileExtension;
+                                _this.fileContent = file.content;
+                                resolve();
+                            }, function () { return console.log("Error de carga de archivo Drive."); });
+                            _this.googleAPI.getUserInfo('me')
+                                .then(function (user) { return _this.setUser(user.email, user.displayName, user.picture); }, function () {
+                                console.log('fail loading ');
                             });
-                        })
-                    ]).then(function () {
+                            _this.loaded = true;
+                        }, function (err) {
+                            console.log(err);
+                            _this.loaded = true;
+                        });
+                    });
+                    Promise.all([loadContent, getConfigLang]).then(function () {
                         console.log("todo listo, calisto");
                         console.log(_this.languages);
+                        var formats = _this.languages[_this.fileExtension].formats;
+                        _this.extensions = [];
+                        for (var f in formats) {
+                            console.log(formats[f].format);
+                            _this.extensions.push(formats[f].format);
+                        }
+                        //    this.initAce();
+                        _this.replaceEditorContent(_this.fileContent);
                         _this.setEditorHandlers();
                         _this.setEditorParameters();
+                        $('ul.tabs').tabs();
                     });
                 }
+                AppComponent.prototype.ngOnInit = function () {
+                    //setTimeout(() => {
+                    console.log('hola4554654645');
+                    $('ul.tabs').tabs('select_tab', 'iagree');
+                    //}, 5000);
+                    //for(let ex in this.extensions){
+                    //    Tabs.addTab(ex);
+                    //}
+                };
                 AppComponent.prototype.initAce = function () {
                     this.editor = ace.edit("editor");
                     //this.editor.setTheme("ace/theme/xcode");
                     // this.editor.getSession().setMode("ace/mode/javascript");
                     // Disable sintax error
                     this.editor.getSession().setUseWorker(false);
+                    //Remove 80character vertical line
+                    this.editor.setShowPrintMargin(false);
                 };
                 AppComponent.prototype.setEditorHandlers = function () {
                     var _this = this;
@@ -162,16 +160,22 @@ System.register(['angular2/core', 'angular2/http', './language.service', './Goog
                         this.editor.getSession().setMode(selectedFormat.editorModeId);
                     }
                 };
-                AppComponent.prototype.setUser = function (displayname, picture) {
+                AppComponent.prototype.setUser = function (email, displayname, picture) {
                     this.user = {
+                        email: email,
                         displayName: displayname,
                         picture: picture
                     };
+                };
+                AppComponent.prototype.clickedEventRecievedFromTabs = function (e) {
+                    console.log('Yayyyyyy tab has changed to ' + e);
+                    console.log(e);
                 };
                 AppComponent = __decorate([
                     core_1.Component({
                         selector: 'app',
                         templateUrl: 'templates/app.html',
+                        directives: [tabs_1.Tabs, editor_1.Editor]
                     }), 
                     __metadata('design:paramtypes', [http_1.Http, language_service_1.LanguageService])
                 ], AppComponent);
