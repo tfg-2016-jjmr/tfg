@@ -10,8 +10,9 @@ import {Component, Input, Output, OnInit, EventEmitter} from "angular2/core";
 export class Tabs implements OnInit{
     //@Input() extensions : string[];
     @Input() tabs : string[];
-    //@Output() clickedTab: EventEmitter<string> = new EventEmitter();
+    @Output() changeTab: EventEmitter<string> = new EventEmitter();
     selectedTab: string;
+    @Input() selectedFormat: string;
 
     addTab(tab: string) {
         this.tabs.push(tab);
@@ -20,18 +21,20 @@ export class Tabs implements OnInit{
     ngOnInit(){
         console.log('toolbar initialised');
         console.log(this.tabs);
+        this.selectedFormat = 'iagree';
     }
 
-    selectTab( language: string): void{
-        //event.preventDefault();
+    setSelectedTab($event,  language: string): void{
+        $event.preventDefault();
 
         if(this.selectedTab === language)
             return;
 
         this.selectedTab = language;
+        this.selectedFormat= language;
 
         console.log(this.selectedTab);
-        //this.clickedTab.emit(this.selectedTab);
-        //this.clickedTab.emit(null);
+        //this.changeTab.next(this.selectedTab);
+        this.changeTab.emit(this.selectedTab);
     }
 }

@@ -25,10 +25,24 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
             LanguageService = (function () {
                 function LanguageService(http) {
                     this.http = http;
-                    this._baserURL = 'https://labs.isa.us.es:8181';
                 }
                 LanguageService.prototype.getLanguage = function (languagePath) {
                     return this.http.get('/api/language' + languagePath)
+                        .map(function (res) { return res.json(); })
+                        .catch(this.handleError);
+                };
+                LanguageService.prototype.postCheckLanguage = function (languageId, format, content, fileUri) {
+                    var url = '/api/checkLanguage' + languageId + "/format/" + format;
+                    var body = 'id=' + format + '&content=' + encodeURIComponent(content) + '&fileUri=' + fileUri;
+                    var headers = new http_1.Headers();
+                    headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                    headers.append('DNT', '1');
+                    //headers.append('Referer', 'https://labs.isa.us.es:8181/IDEAS/app/editor');
+                    var options = {
+                        headers: headers
+                    };
+                    console.log(body);
+                    return this.http.post(url, body, options)
                         .map(function (res) { return res.json(); })
                         .catch(this.handleError);
                 };
@@ -49,4 +63,4 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
         }
     }
 });
-//# sourceMappingURL=language.service.js.map
+//# sourceMappingURL=languageService.js.map

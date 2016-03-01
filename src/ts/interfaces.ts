@@ -42,3 +42,10 @@ export interface IOperation {
     data: Object,
     action: string;
 }
+
+
+export interface IUser {
+    email: string;
+    displayName: string;
+    picture?: string;
+}

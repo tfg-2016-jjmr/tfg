@@ -27,12 +27,17 @@
 		</div>
 	</nav>
 
-	<tabs *ngIf="loaded" [tabs]="extensions" (selectedTab)='selectedFormat' ></tabs>
+	<tabs *ngIf="loaded && extensions !== undefined" [tabs]="extensions" [selectedFormat]='selectedFormat' ></tabs>
 </div>
 
 <div class="progress light-blue" style="margin:0;" *ngIf="!loaded">
 	<div class="indeterminate white"></div>
 </div>
 
-<editor [id]="fileId" [format]="selectedFormat"></editor>
+<editor [id]="fileId"
+        [config] = "configuration"
+        [format]="selectedFormat"
+        [language]='languageSettings'
+        (fileExtension)="extensionSelectedEvent($event)"
+		(fileNameChange)="fileNameChangedEvent($event)"></editor>
 <!--<div id="editor"></div>-->
