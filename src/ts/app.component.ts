@@ -9,7 +9,7 @@
 import {Component, View, OnInit} from 'angular2/core';
 import {Http, HTTP_PROVIDERS, Response, Request, Headers} from 'angular2/http';
 import {LanguageService} from './services/languageService';
-//import {MyGapi, User} from './GoogleAPI';
+import {GoogleService} from './services/GoogleService';
 import 'rxjs/Rx';
 import { IConfiguration, ILanguage, IFormat, IOperation, IUser} from './interfaces';
 import {Tabs} from './components/tabs';
@@ -20,12 +20,13 @@ import {Editor} from './components/editor';
 @Component({
     selector: 'app',
     templateUrl: 'templates/app.html',
-    directives: [Tabs, Editor]
+    directives: [Tabs, Editor],
+    providers: [GoogleService]
 })
 export class AppComponent implements OnInit{
     user: IUser;
     editor: any;
-    fileName: string;
+    fileName: string  = 'Governify';
     fileId: string = '';
     fileExtension: string;
     fileContent: string;
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit{
     extensions: string[] = [''];
     languageSettings: ILanguage;
 
-    constructor(public http: Http, private _languageService: LanguageService) {
+    constructor(public http: Http, private _languageService: LanguageService, private _GS: GoogleService) {
         $('body').removeClass('unresolved');
 
         this.languages = {};
@@ -45,27 +46,59 @@ export class AppComponent implements OnInit{
             this.http.get('/api/configuration')
                 .map(res => res.json())
                 .subscribe(
-                    (data) => {
-                        this.configuration = data;
-                        let aLenguagesDeferred = [];
-                        $.each(this.configuration.languages, (languageId, languagePath) => {
-                            aLenguagesDeferred.push((() => {
-                                let d = new Promise((resolve, reject) => {
-                                    this._languageService.getLanguage(languagePath)
-                                        .subscribe(
-                                            (lang:ILanguage) => {
-                                                this.languages[lang.extension] = lang;
-                                                resolve();
-                                            },
-                                            (err) => {
-                                                console.log(err);
-                                                reject();
-                                            });
-                                });
-                                return d;
-                            })());
+                (data) => {
+                    this.configuration = data;
+                    let aLenguagesDeferred = [];
+                    $.each(this.configuration.languages, (languageId, languagePath) => {
+                        aLenguagesDeferred.push((() => {
+                            let d = new Promise((resolve, reject) => {
+                                this._languageService.getLanguage(languagePath)
+                                    .subscribe(
+                                    (lang: ILanguage) => {
+                                        this.languages[lang.extension] = lang;
+                                        resolve();
+                                    },
+                                    (err) => {
+                                        console.log(err);
+                                        reject();
+                                    });
+                            });
+                            return d;
+                        })());
 
-                        });
+                    });
+
+                    // aLenguagesDeferred.push((() => {
+                    //     let d = new Promise((resolve, reject) => {
+                    //         this._GS.authorize().then(
+                    //             (token) => {
+                    //                 console.log('authorized to get user');
+                    //                 this._GS.getUserInfo('me')
+                    //                     .then(
+                    //                     (user: IUser) => {
+                    //                         console.log('user returned');
+                    //                         console.log(user);
+
+                    //                         // this.setUser(user.email, user.displayName, user.picture)
+                    //                         resolve();
+                    //                     },
+                    //                     () => {
+                    //                         console.log('fail loading ')
+                    //                         reject()
+                    //                     }
+                    //                     );
+
+                    //                 // this.loaded = true;
+                    //             },
+                    //             (err) => {
+                    //                 console.log(err);
+                    //                 // this.loaded = true;
+                    //             }
+                    //         )
+                    //         return d;
+                    //     })
+                    // })());
+
 
                         Promise.all(aLenguagesDeferred).then(() => resolve(), ()=> reject());
                     },
@@ -90,6 +123,10 @@ export class AppComponent implements OnInit{
             //this.setEditorHandlers();
             //this.setEditorParameters();
         });
+
+
+        
+
 
 
 

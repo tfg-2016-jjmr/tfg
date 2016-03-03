@@ -22,7 +22,7 @@ export class LanguageService {
         let body = 'id='+format+'&content='+encodeURIComponent(content)+'&fileUri='+fileUri;
         let headers = new Headers();
             headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            headers.append('DNT', '1');
+            headers.append('accept', 'application/json');
             //headers.append('Referer', 'https://labs.isa.us.es:8181/IDEAS/app/editor');
         let options = {
             headers: headers

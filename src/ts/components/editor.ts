@@ -48,7 +48,7 @@ export class Editor implements OnInit, OnChanges {
                                 (content) => {
                                     console.log('succes getting file content');
                                     this.replaceEditorContent(content);
-                                    //this.checkLanguage();
+                                    this.checkLanguage();
                                     this.setEditorHandlers();
                                 },
                                 (err) => {
@@ -121,33 +121,37 @@ export class Editor implements OnInit, OnChanges {
 
     checkLanguage(){
         console.log('inside checkLanguage');
-        let url = 'https://labs.isa.us.es:8181'+ this.config.languages[this.language.id] + '/language/format/'+this.selectedFormat.format+"/checkLanguage";
-        var headers = new Headers();
-            headers.append('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
-            headers.append('Host', 'labs.isa.us.es:8181');
-            //headers.append('Cookie','_ga=GA1.2.1232218510.1442432386');
-        let body = 'id='+this.selectedFormat.format+'&content='+encodeURIComponent(this.editor.getValue())+'&fileUri=';
-        let options = {
-            headers: headers,
-            rejectUnauthorized: false
-        };
+        // let url = 'https://labs.isa.us.es:8181'+ this.config.languages[this.language.id] + '/language/format/'+this.selectedFormat.format+"/checkLanguage";
+        // var headers = new Headers();
+        //     headers.append('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
+        //     headers.append('Host', 'labs.isa.us.es:8181');
+        //     //headers.append('Cookie','_ga=GA1.2.1232218510.1442432386');
+        // let body = 'id='+this.selectedFormat.format+'&content='+encodeURIComponent(this.editor.getValue())+'&fileUri=';
+        // let options = {
+        //     headers: headers,
+        //     rejectUnauthorized: false
+        // };
 
-        console.log(url);
-        this.http.post(url, body, options )
-            .subscribe(
-                (data) => {
-                    console.log(data);
-                },
-                (err) => {
-                    console.log(err);
-                }
-            );
+        // console.log(url);
+        // this.http.post(url, body, options )
+        //     .subscribe(
+        //         (data) => {
+        //             console.log(data);
+        //         },
+        //         (err) => {
+        //             console.log(err);
+        //         }
+        //     );
 
-        //this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
-        //    .subscribe(
-        //        (data) => {console.log(data)
-        //        }
-        //    );
+        this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
+           .subscribe(
+               (data) => {
+                   console.log(data);
+               },
+               (err) => {
+                   console.log(err);
+               }
+           );
 
     }
 

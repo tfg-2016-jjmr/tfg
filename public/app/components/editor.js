@@ -2,7 +2,9 @@
  * Created by mrivero on 20/02/2016.
  */
 /// <reference path="../d/ace.d.ts" />
-System.register(["angular2/core", "../services/GoogleService", '../services/languageService', 'angular2/http'], function(exports_1) {
+System.register(["angular2/core", "../services/GoogleService", '../services/languageService', 'angular2/http'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -54,7 +56,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                                 .subscribe(function (content) {
                                 console.log('succes getting file content');
                                 _this.replaceEditorContent(content);
-                                //this.checkLanguage();
+                                _this.checkLanguage();
                                 _this.setEditorHandlers();
                             }, function (err) {
                                 console.log('error getting file content');
@@ -106,28 +108,32 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                 };
                 Editor.prototype.checkLanguage = function () {
                     console.log('inside checkLanguage');
-                    var url = 'https://labs.isa.us.es:8181' + this.config.languages[this.language.id] + '/language/format/' + this.selectedFormat.format + "/checkLanguage";
-                    var headers = new http_1.Headers();
-                    headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-                    headers.append('Host', 'labs.isa.us.es:8181');
-                    //headers.append('Cookie','_ga=GA1.2.1232218510.1442432386');
-                    var body = 'id=' + this.selectedFormat.format + '&content=' + encodeURIComponent(this.editor.getValue()) + '&fileUri=';
-                    var options = {
-                        headers: headers,
-                        rejectUnauthorized: false
-                    };
-                    console.log(url);
-                    this.http.post(url, body, options)
+                    // let url = 'https://labs.isa.us.es:8181'+ this.config.languages[this.language.id] + '/language/format/'+this.selectedFormat.format+"/checkLanguage";
+                    // var headers = new Headers();
+                    //     headers.append('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
+                    //     headers.append('Host', 'labs.isa.us.es:8181');
+                    //     //headers.append('Cookie','_ga=GA1.2.1232218510.1442432386');
+                    // let body = 'id='+this.selectedFormat.format+'&content='+encodeURIComponent(this.editor.getValue())+'&fileUri=';
+                    // let options = {
+                    //     headers: headers,
+                    //     rejectUnauthorized: false
+                    // };
+                    // console.log(url);
+                    // this.http.post(url, body, options )
+                    //     .subscribe(
+                    //         (data) => {
+                    //             console.log(data);
+                    //         },
+                    //         (err) => {
+                    //             console.log(err);
+                    //         }
+                    //     );
+                    this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
                         .subscribe(function (data) {
                         console.log(data);
                     }, function (err) {
                         console.log(err);
                     });
-                    //this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
-                    //    .subscribe(
-                    //        (data) => {console.log(data)
-                    //        }
-                    //    );
                 };
                 Editor.prototype.setEditorHandlers = function () {
                     var _this = this;
@@ -173,7 +179,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                     __metadata('design:paramtypes', [http_1.Http, GoogleService_1.GoogleService, languageService_1.LanguageService])
                 ], Editor);
                 return Editor;
-            })();
+            }());
             exports_1("Editor", Editor);
         }
     }

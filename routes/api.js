@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var querystring = require('querystring');
 var firebase = require('firebase');
 var db = new firebase('https://tfg2016jjrm.firebaseio.com/');
 var ideasURL = 'https://labs.isa.us.es:8181/';
@@ -47,64 +48,59 @@ router.get('/configuration', function(req, res, next) {
 });
 
 router.get('/language/:languagePath', function(req, res, next) {
-    var langURL = ideasURL + req.params.languagePath + "/language",
-		result;
-        console.log(langURL);
-
 	var options = {
-		host: 'labs.isa.us.es',
-		port: 8181,
-		path: '/' + req.params.languagePath+ "/language",
-		method: 'GET',
-		rejectUnauthorized: false
-	};
-
-	var request = https.request(options, function(response) {
-		console.log('statusCode: ', response.statusCode);
-		console.log('headers: ', response.headers);
-
-		response.on('data', function(d) {
-			//console.log(JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d))))
-			res.json(JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d))));
+			host: 'labs.isa.us.es',
+			port: 8181,
+			path: '/' + req.params.languagePath+ "/language",
+			method: 'GET',
+			rejectUnauthorized: false
+		},
+		request = https.request(options, function(response) {
+			response.on('data', function(d) {
+				try {
+					var data = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d)));
+					res.json(data);
+				} catch (e) {
+					console.log(e);
+				}
+			});
 		});
-	});
-	request.end();
 
 	request.on('error', function(e) {
 		console.error(e);
 	});
+
+	request.end();
 });
 
 router.post('/checklanguage/:language/format/:format', function(req, res, next) {
-	//https://labs.isa.us.es:8181/ideas-iagree-template-language/language/format/iagree/checkLanguage
-
-	console.log(req.body);
-	console.log(req.headers);
-
-	var options = {
-		host: 'labs.isa.us.es',
-		port: 8181,
-		path: '/' + req.params.language+ "/language/format/" + req.params.format + "/checkLanguage",
-		method: 'POST',
-		rejectUnauthorized: false,
-		headers: req.headers,
-		body: req.body
-	};
-
-	var request = https.request(options, function(response) {
-		console.log('statusCode: ', response.statusCode);
-		console.log('headers: ', response.headers);
-
-		response.on('data', function(d) {
-			console.log(JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d))));
-			res.json(JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d))));
+	var data = querystring.stringify(req.body),
+		headers = req.headers,
+		options = {
+			host: 'labs.isa.us.es',
+			port: 8181,
+			path: '/' + req.params.language+ "/language/format/" + req.params.format + "/checkLanguage",
+			method: 'POST',
+			rejectUnauthorized: false,
+			headers: headers
+		},
+		request = https.request(options, function(response) {
+			response.on('data', function(d) {
+				try {
+					var data = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d)));
+					res.json(data);
+				} catch (e) {
+					console.log(e);
+				}
+			});
 		});
-	});
-	request.end();
 
 	request.on('error', function(e) {
 		console.error(e);
 	});
+
+	request.write(data);
+	request.end();
 });
 
 

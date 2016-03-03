@@ -1,7 +1,9 @@
 /**
  * Created by mrivero on 27/12/2015.
  */
-System.register(['angular2/core', 'angular2/http', './services/languageService', 'rxjs/Rx', './components/tabs', './components/editor'], function(exports_1) {
+System.register(['angular2/core', 'angular2/http', './services/languageService', './services/GoogleService', 'rxjs/Rx', './components/tabs', './components/editor'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -11,7 +13,7 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, http_1, languageService_1, tabs_1, editor_1;
+    var core_1, http_1, languageService_1, GoogleService_1, tabs_1, editor_1;
     var AppComponent;
     return {
         setters:[
@@ -24,6 +26,9 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
             function (languageService_1_1) {
                 languageService_1 = languageService_1_1;
             },
+            function (GoogleService_1_1) {
+                GoogleService_1 = GoogleService_1_1;
+            },
             function (_1) {},
             function (tabs_1_1) {
                 tabs_1 = tabs_1_1;
@@ -33,10 +38,12 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
             }],
         execute: function() {
             AppComponent = (function () {
-                function AppComponent(http, _languageService) {
+                function AppComponent(http, _languageService, _GS) {
                     var _this = this;
                     this.http = http;
                     this._languageService = _languageService;
+                    this._GS = _GS;
+                    this.fileName = 'Governify';
                     this.fileId = '';
                     this.loaded = false;
                     this.selectedFormat = '';
@@ -64,6 +71,34 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                                     return d;
                                 })());
                             });
+                            // aLenguagesDeferred.push((() => {
+                            //     let d = new Promise((resolve, reject) => {
+                            //         this._GS.authorize().then(
+                            //             (token) => {
+                            //                 console.log('authorized to get user');
+                            //                 this._GS.getUserInfo('me')
+                            //                     .then(
+                            //                     (user: IUser) => {
+                            //                         console.log('user returned');
+                            //                         console.log(user);
+                            //                         // this.setUser(user.email, user.displayName, user.picture)
+                            //                         resolve();
+                            //                     },
+                            //                     () => {
+                            //                         console.log('fail loading ')
+                            //                         reject()
+                            //                     }
+                            //                     );
+                            //                 // this.loaded = true;
+                            //             },
+                            //             (err) => {
+                            //                 console.log(err);
+                            //                 // this.loaded = true;
+                            //             }
+                            //         )
+                            //         return d;
+                            //     })
+                            // })());
                             Promise.all(aLenguagesDeferred).then(function () { return resolve(); }, function () { return reject(); });
                         }, function (err) {
                             console.log(err);
@@ -135,8 +170,8 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     this.languageSettings = this.languages[ext];
                     var formats = this.languageSettings.formats;
                     this.extensions = [];
-                    for (var _i = 0; _i < formats.length; _i++) {
-                        var f = formats[_i];
+                    for (var _i = 0, formats_1 = formats; _i < formats_1.length; _i++) {
+                        var f = formats_1[_i];
                         console.log(f.format);
                         this.extensions.push(f.format);
                     }
@@ -152,12 +187,13 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     core_1.Component({
                         selector: 'app',
                         templateUrl: 'templates/app.html',
-                        directives: [tabs_1.Tabs, editor_1.Editor]
+                        directives: [tabs_1.Tabs, editor_1.Editor],
+                        providers: [GoogleService_1.GoogleService]
                     }), 
-                    __metadata('design:paramtypes', [http_1.Http, languageService_1.LanguageService])
+                    __metadata('design:paramtypes', [http_1.Http, languageService_1.LanguageService, GoogleService_1.GoogleService])
                 ], AppComponent);
                 return AppComponent;
-            })();
+            }());
             exports_1("AppComponent", AppComponent);
         }
     }
