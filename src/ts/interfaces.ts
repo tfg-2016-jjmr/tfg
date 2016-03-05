@@ -49,3 +49,14 @@ export interface IUser {
     displayName: string;
     picture?: string;
 }
+
+export interface IAnnotations {
+    annotations: any[];
+    context: any;
+    customStruct: any;
+    data: any;
+    fileUri: string;
+    htmlMessage: any;
+    message: any;
+    status: string;
+}

@@ -23,11 +23,10 @@ export class LanguageService {
         let headers = new Headers();
             headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             headers.append('accept', 'application/json');
-            //headers.append('Referer', 'https://labs.isa.us.es:8181/IDEAS/app/editor');
         let options = {
             headers: headers
         };
-        console.log(body);
+
         return this.http.post(url, body, options)
             .map(res => res.json())
             .catch(this.handleError);

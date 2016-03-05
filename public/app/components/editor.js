@@ -2,9 +2,7 @@
  * Created by mrivero on 20/02/2016.
  */
 /// <reference path="../d/ace.d.ts" />
-System.register(["angular2/core", "../services/GoogleService", '../services/languageService', 'angular2/http'], function(exports_1, context_1) {
-    "use strict";
-    var __moduleName = context_1 && context_1.id;
+System.register(["angular2/core", "../services/GoogleService", '../services/languageService', 'angular2/http'], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -99,41 +97,23 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                         console.log(selectedFormat.editorModeId);
                         this.editor.getSession().setMode(this.selectedFormat.editorModeId);
                     }
-                    if (this.selectedFormat.checkLanguage) {
-                        console.log(this.selectedFormat);
-                        console.log(this.config.languages[this.language.id]);
-                        console.log(this.selectedFormat.format);
-                        console.log(this.editor);
-                    }
                 };
                 Editor.prototype.checkLanguage = function () {
-                    console.log('inside checkLanguage');
-                    // let url = 'https://labs.isa.us.es:8181'+ this.config.languages[this.language.id] + '/language/format/'+this.selectedFormat.format+"/checkLanguage";
-                    // var headers = new Headers();
-                    //     headers.append('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
-                    //     headers.append('Host', 'labs.isa.us.es:8181');
-                    //     //headers.append('Cookie','_ga=GA1.2.1232218510.1442432386');
-                    // let body = 'id='+this.selectedFormat.format+'&content='+encodeURIComponent(this.editor.getValue())+'&fileUri=';
-                    // let options = {
-                    //     headers: headers,
-                    //     rejectUnauthorized: false
-                    // };
-                    // console.log(url);
-                    // this.http.post(url, body, options )
-                    //     .subscribe(
-                    //         (data) => {
-                    //             console.log(data);
-                    //         },
-                    //         (err) => {
-                    //             console.log(err);
-                    //         }
-                    //     );
-                    this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
-                        .subscribe(function (data) {
-                        console.log(data);
-                    }, function (err) {
-                        console.log(err);
-                    });
+                    var _this = this;
+                    if (this.selectedFormat.checkLanguage) {
+                        this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
+                            .subscribe(function (data) {
+                            console.log(data);
+                            if (data.status === 'OK') {
+                                console.log('No errors in this file. Yahooooo!');
+                            }
+                            else {
+                                _this.setAnnotations(data.annotations);
+                            }
+                        }, function (err) {
+                            console.log(err);
+                        });
+                    }
                 };
                 Editor.prototype.setEditorHandlers = function () {
                     var _this = this;
@@ -179,7 +159,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                     __metadata('design:paramtypes', [http_1.Http, GoogleService_1.GoogleService, languageService_1.LanguageService])
                 ], Editor);
                 return Editor;
-            }());
+            })();
             exports_1("Editor", Editor);
         }
     }

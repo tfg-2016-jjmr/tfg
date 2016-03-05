@@ -1,6 +1,4 @@
-System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(exports_1, context_1) {
-    "use strict";
-    var __moduleName = context_1 && context_1.id;
+System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -39,11 +37,9 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                     headers.append('accept', 'application/json');
-                    //headers.append('Referer', 'https://labs.isa.us.es:8181/IDEAS/app/editor');
                     var options = {
                         headers: headers
                     };
-                    console.log(body);
                     return this.http.post(url, body, options)
                         .map(function (res) { return res.json(); })
                         .catch(this.handleError);
@@ -60,7 +56,7 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                     __metadata('design:paramtypes', [http_1.Http])
                 ], LanguageService);
                 return LanguageService;
-            }());
+            })();
             exports_1("LanguageService", LanguageService);
         }
     }

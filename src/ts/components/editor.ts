@@ -7,7 +7,7 @@ import {Component, Input, Output, OnInit, OnChanges, SimpleChange, EventEmitter}
 import {GoogleService} from "../services/GoogleService";
 import {LanguageService} from '../services/languageService';
 import {Http, HTTP_PROVIDERS, Response, Request, Headers} from 'angular2/http';
-import {ILanguage, IFormat, IOperation, IConfiguration} from "../interfaces";
+import {ILanguage, IFormat, IOperation, IConfiguration, IAnnotations} from "../interfaces";
 
 
 @Component({
@@ -106,53 +106,25 @@ export class Editor implements OnInit, OnChanges {
             console.log(selectedFormat.editorModeId);
             this.editor.getSession().setMode(this.selectedFormat.editorModeId);
         }
-
-        if(this.selectedFormat.checkLanguage){
-            console.log(this.selectedFormat);
-            console.log(this.config.languages[this.language.id]);
-            console.log(this.selectedFormat.format);
-            console.log(this.editor);
-            //console.log(this.editor.getSession().getValue());
-
-            //this.http.get('/api/checkLanguage' + this.config.languages[this.language.id] + "/format/" + this.selectedFormat.format)
-            //    .map(res => res.json())
-        }
     }
 
     checkLanguage(){
-        console.log('inside checkLanguage');
-        // let url = 'https://labs.isa.us.es:8181'+ this.config.languages[this.language.id] + '/language/format/'+this.selectedFormat.format+"/checkLanguage";
-        // var headers = new Headers();
-        //     headers.append('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
-        //     headers.append('Host', 'labs.isa.us.es:8181');
-        //     //headers.append('Cookie','_ga=GA1.2.1232218510.1442432386');
-        // let body = 'id='+this.selectedFormat.format+'&content='+encodeURIComponent(this.editor.getValue())+'&fileUri=';
-        // let options = {
-        //     headers: headers,
-        //     rejectUnauthorized: false
-        // };
-
-        // console.log(url);
-        // this.http.post(url, body, options )
-        //     .subscribe(
-        //         (data) => {
-        //             console.log(data);
-        //         },
-        //         (err) => {
-        //             console.log(err);
-        //         }
-        //     );
-
-        this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
-           .subscribe(
-               (data) => {
-                   console.log(data);
-               },
-               (err) => {
-                   console.log(err);
-               }
-           );
-
+        if (this.selectedFormat.checkLanguage){
+            this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
+               .subscribe(
+                   (data: IAnnotations) => {
+                       console.log(data);
+                       if (data.status === 'OK'){
+                            console.log('No errors in this file. Yahooooo!')
+                       } else {
+                            this.setAnnotations(data.annotations);
+                       }
+                   },
+                   (err) => {
+                       console.log(err);
+                   }
+               );
+        }
     }
 
 

@@ -1,9 +1,7 @@
 /**
  * Created by mrivero on 27/12/2015.
  */
-System.register(['angular2/core', 'angular2/http', './services/languageService', './services/GoogleService', 'rxjs/Rx', './components/tabs', './components/editor'], function(exports_1, context_1) {
-    "use strict";
-    var __moduleName = context_1 && context_1.id;
+System.register(['angular2/core', 'angular2/http', './services/languageService', './services/GoogleService', 'rxjs/Rx', './components/tabs', './components/editor'], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -170,8 +168,8 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     this.languageSettings = this.languages[ext];
                     var formats = this.languageSettings.formats;
                     this.extensions = [];
-                    for (var _i = 0, formats_1 = formats; _i < formats_1.length; _i++) {
-                        var f = formats_1[_i];
+                    for (var _i = 0; _i < formats.length; _i++) {
+                        var f = formats[_i];
                         console.log(f.format);
                         this.extensions.push(f.format);
                     }
@@ -193,7 +191,7 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     __metadata('design:paramtypes', [http_1.Http, languageService_1.LanguageService, GoogleService_1.GoogleService])
                 ], AppComponent);
                 return AppComponent;
-            }());
+            })();
             exports_1("AppComponent", AppComponent);
         }
     }
