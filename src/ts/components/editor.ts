@@ -15,7 +15,7 @@ import {ILanguage, IFormat, IOperation, IConfiguration, IAnnotations} from "../i
     templateUrl: 'templates/editor.html',
     providers: [LanguageService, GoogleService]
 })
-export class Editor implements OnInit, OnChanges {
+export class Editor implements OnChanges {
     @Input() id: string;
     @Input() format: string;
     @Input() language: ILanguage;
@@ -42,7 +42,7 @@ export class Editor implements OnInit, OnChanges {
             this.oldFormat = changes["selectedFormat"].previousValue;
             this.convertLanguage(this.selectedFormat, this.oldFormat);
         }
-        if (changes["id"]) {
+        if (changes["id"] && typeof changes["id"].currentValue !== 'undefined' && changes["id"].currentValue !== "") {
             console.log('EDITOR Initialised');
             this.initAce();
             this._GS.authorize().then(
@@ -50,6 +50,7 @@ export class Editor implements OnInit, OnChanges {
                     console.log('yahooo en el constructor con ide: ' + this.id);
                     this._GS.loadDriveFile(this.id).then(
                         (file:Object) => {
+                            console.log("THE FILE!!!");
                             console.log(file);
                             this.fileName = file.title;
                             this.fileNameChange.next(this.fileName);
@@ -60,6 +61,7 @@ export class Editor implements OnInit, OnChanges {
                                     (content) => {
                                         console.log('succes getting file content');
                                         this.replaceEditorContent(content);
+                                        console.log(this.checkLanguage);
                                         this.checkLanguage();
                                         this.setEditorHandlers();
                                     },
@@ -109,8 +111,8 @@ export class Editor implements OnInit, OnChanges {
         }
     }
 
-    checkLanguage(){
-        return new Promise((resolve, reject) => {
+    checkLanguage() : Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
                 .subscribe(
                     (data: IAnnotations) => {

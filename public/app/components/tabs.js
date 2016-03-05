@@ -23,11 +23,14 @@ System.register(["angular2/core"], function(exports_1) {
                 Tabs.prototype.addTab = function (tab) {
                     this.tabs.push(tab);
                 };
+                Tabs.prototype.ngOnChanges = function (changes) {
+                    if (changes['tabs'] && typeof changes["tabs"].currentValue !== 'undefined') {
+                        console.log('toolbar initialised');
+                        console.log(this.tabs);
+                        this.selectedFormat = 'iagree';
+                    }
+                };
                 Tabs.prototype.ngOnInit = function () {
-                    console.log('toolbar initialised');
-                    console.log(this.tabs);
-                    this.selectedFormat = 'iagree';
-                    $(window).trigger('resize');
                 };
                 Tabs.prototype.setSelectedTab = function ($event, language) {
                     $event.preventDefault();

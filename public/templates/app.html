@@ -27,7 +27,10 @@
 		</div>
 	</nav>
 
-	<tabs *ngIf="loaded && extensions !== undefined" [tabs]="extensions" [selectedFormat]='selectedFormat' ></tabs>
+	<tabs *ngIf="loaded &&
+	             extensions != null &&
+	             extensions?.length > 0 &&
+	             selectedFormat != null" [tabs]="extensions" [selectedFormat]='selectedFormat' ></tabs>
 </div>
 
 <div class="progress light-blue" style="margin:0;" *ngIf="!loaded">

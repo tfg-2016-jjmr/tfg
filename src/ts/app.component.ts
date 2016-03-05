@@ -27,7 +27,7 @@ export class AppComponent implements OnInit{
     user: IUser;
     editor: any;
     fileName: string  = 'Governify';
-    fileId: string = '';
+    fileId: string;
     fileExtension: string;
     fileContent: string;
     loaded: boolean = false;
@@ -183,23 +183,24 @@ export class AppComponent implements OnInit{
     }
 
     setSelectedFormat(e){
-
         console.log('Yayyyyyy tab has changed to ' + e);
         console.log(e);
     }
 
     extensionSelectedEvent(ext: string) {
-        console.log(ext);
         this.languageSettings = this.languages[ext];
-
+        console.log(ext);
+        console.log(this.languageSettings);
         let formats = this.languageSettings.formats;
         this.extensions = [];
         for(let f of formats){
             console.log(f.format);
             this.extensions.push(f.format);
         }
+        this.selectedFormat = ext;
         $('ul.tabs').tabs();
         $('ul.tabs').tabs('select_tab', formats[0].format);
+        setTimeout(() => $(window).trigger('resize'), 100);
     }
 
     fileNameChangedEvent(fileName: string) {

@@ -48,12 +48,13 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                         this.oldFormat = changes["selectedFormat"].previousValue;
                         this.convertLanguage(this.selectedFormat, this.oldFormat);
                     }
-                    if (changes["id"]) {
+                    if (changes["id"] && typeof changes["id"].currentValue !== 'undefined' && changes["id"].currentValue !== "") {
                         console.log('EDITOR Initialised');
                         this.initAce();
                         this._GS.authorize().then(function () {
                             console.log('yahooo en el constructor con ide: ' + _this.id);
                             _this._GS.loadDriveFile(_this.id).then(function (file) {
+                                console.log("THE FILE!!!");
                                 console.log(file);
                                 _this.fileName = file.title;
                                 _this.fileNameChange.next(_this.fileName);
@@ -63,6 +64,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                                     .subscribe(function (content) {
                                     console.log('succes getting file content');
                                     _this.replaceEditorContent(content);
+                                    console.log(_this.checkLanguage);
                                     _this.checkLanguage();
                                     _this.setEditorHandlers();
                                 }, function (err) {

@@ -42,7 +42,6 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     this._languageService = _languageService;
                     this._GS = _GS;
                     this.fileName = 'Governify';
-                    this.fileId = '';
                     this.loaded = false;
                     this.selectedFormat = '';
                     this.extensions = [''];
@@ -164,8 +163,9 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     console.log(e);
                 };
                 AppComponent.prototype.extensionSelectedEvent = function (ext) {
-                    console.log(ext);
                     this.languageSettings = this.languages[ext];
+                    console.log(ext);
+                    console.log(this.languageSettings);
                     var formats = this.languageSettings.formats;
                     this.extensions = [];
                     for (var _i = 0; _i < formats.length; _i++) {
@@ -173,8 +173,10 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                         console.log(f.format);
                         this.extensions.push(f.format);
                     }
+                    this.selectedFormat = ext;
                     $('ul.tabs').tabs();
                     $('ul.tabs').tabs('select_tab', formats[0].format);
+                    setTimeout(function () { return $(window).trigger('resize'); }, 100);
                 };
                 AppComponent.prototype.fileNameChangedEvent = function (fileName) {
                     console.log(fileName);
