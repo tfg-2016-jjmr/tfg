@@ -104,6 +104,38 @@ router.post('/checklanguage/:language/format/:format', function(req, res, next) 
 });
 
 
+router.post('/convert/:language', function(req, res, next) {
+
+	var data = querystring.stringify(req.body),
+		headers = req.headers,
+		options = {
+			host: 'labs.isa.us.es',
+			port: 8181,
+			path: '/' + req.params.language+ "/language/convert",
+			method: 'POST',
+			rejectUnauthorized: false,
+			headers: headers
+		},
+		request = https.request(options, function(response) {
+			response.on('data', function(d) {
+				try {
+					var data = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d)));
+					res.json(data);
+				} catch (e) {
+					console.log(e);
+				}
+			});
+		});
+
+	request.on('error', function(e) {
+		console.error(e);
+	});
+
+	request.write(data);
+	request.end();
+});
+
+
 router.get('/test', function(req, res, next) {
 	res.json({firstname: 'John', lastname: 'Doe' });
 });

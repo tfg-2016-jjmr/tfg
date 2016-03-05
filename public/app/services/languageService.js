@@ -44,6 +44,22 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                         .map(function (res) { return res.json(); })
                         .catch(this.handleError);
                 };
+                LanguageService.prototype.convertLanguage = function (LanguageId, currentFormat, desiredFormat, content, fileUri) {
+                    var url = '/api/convert' + languageId;
+                    var body = 'currentFormat=' + currentFormat +
+                        '&desiredFormat=' + desiredFormat +
+                        '&fileUri=' + fileUri +
+                        '&content=' + content;
+                    var headers = new http_1.Headers();
+                    headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                    headers.append('accept', 'application/json');
+                    var options = {
+                        headers: headers
+                    };
+                    return this.http.post(url, body, options)
+                        .map(function (res) { return res.json(); })
+                        .catch(this.handleError);
+                };
                 LanguageService.prototype.handleError = function (error) {
                     // in a real world app, we may send the server to some remote logging infrastructure
                     // instead of just logging it to the console

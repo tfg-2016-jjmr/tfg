@@ -37,39 +37,40 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                     this.fileExtension = new core_1.EventEmitter();
                     this.fileNameChange = new core_1.EventEmitter();
                 }
-                Editor.prototype.ngOnInit = function () {
-                    var _this = this;
-                    //setInterval(()=>{console.log(this.format)}, 2000);
-                    console.log('EDITOR Initialised');
-                    this.initAce();
-                    this._GS.authorize().then(function () {
-                        console.log('yahooo en el constructor con ide: ' + _this.id);
-                        _this._GS.loadDriveFile(_this.id).then(function (file) {
-                            console.log(file);
-                            _this.fileName = file.title;
-                            _this.fileNameChange.next(_this.fileName);
-                            _this.fileExtension.next(file.fileExtension);
-                            _this._GS.getFileContent(file.downloadUrl)
-                                .map(function (res) { return res.text(); })
-                                .subscribe(function (content) {
-                                console.log('succes getting file content');
-                                _this.replaceEditorContent(content);
-                                _this.checkLanguage();
-                                _this.setEditorHandlers();
-                            }, function (err) {
-                                console.log('error getting file content');
-                            });
-                        });
-                    });
-                };
                 Editor.prototype.ngOnChanges = function (changes) {
+                    var _this = this;
                     if (changes['language'] && typeof changes["language"].currentValue !== 'undefined') {
                         //let oldLang: ILanguage = changes["language"].previousValue;
                         //let newLang: ILanguage = changes["language"].currentValue;
                         this.setEditorParameters(this.language.formats[0]);
                     }
-                };
-                Editor.prototype.processLanguage = function () {
+                    if (changes['selectedFormat'] && typeof changes["selectedFormat"].currentValue !== 'undefined') {
+                        this.oldFormat = changes["selectedFormat"].previousValue;
+                        this.convertLanguage(this.selectedFormat, this.oldFormat);
+                    }
+                    if (changes["id"]) {
+                        console.log('EDITOR Initialised');
+                        this.initAce();
+                        this._GS.authorize().then(function () {
+                            console.log('yahooo en el constructor con ide: ' + _this.id);
+                            _this._GS.loadDriveFile(_this.id).then(function (file) {
+                                console.log(file);
+                                _this.fileName = file.title;
+                                _this.fileNameChange.next(_this.fileName);
+                                _this.fileExtension.next(file.fileExtension);
+                                _this._GS.getFileContent(file.downloadUrl)
+                                    .map(function (res) { return res.text(); })
+                                    .subscribe(function (content) {
+                                    console.log('succes getting file content');
+                                    _this.replaceEditorContent(content);
+                                    _this.checkLanguage();
+                                    _this.setEditorHandlers();
+                                }, function (err) {
+                                    console.log('error getting file content');
+                                });
+                            });
+                        });
+                    }
                 };
                 Editor.prototype.setAnnotations = function (annotations) {
                     this.editor.getSession().setAnnotations(annotations);
@@ -100,31 +101,57 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                 };
                 Editor.prototype.checkLanguage = function () {
                     var _this = this;
-                    if (this.selectedFormat.checkLanguage) {
-                        this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
+                    return new Promise(function (resolve, reject) {
+                        _this._languageService.postCheckLanguage(_this.config.languages[_this.language.id], _this.selectedFormat.format, _this.editor.getValue(), _this.fileName)
                             .subscribe(function (data) {
                             console.log(data);
                             if (data.status === 'OK') {
                                 console.log('No errors in this file. Yahooooo!');
+                                _this.hasError = false;
                             }
                             else {
                                 _this.setAnnotations(data.annotations);
+                                _this.hasError = true;
+                            }
+                            resolve();
+                        }, function (err) {
+                            console.log(err);
+                            reject();
+                        });
+                    });
+                };
+                Editor.prototype.setEditorHandlers = function () {
+                    var _this = this;
+                    this.editor.on('change', function (content) {
+                        // If after checking language there is no error we can save.
+                        if (!_this.selectedFormat.checkLanguage)
+                            return;
+                        _this.checklanguage().then(function () {
+                            if (!_this.hasError) {
+                                if (_this.saveTimeout !== null) {
+                                    clearTimeout(_this.saveTimeout);
+                                }
+                                _this.saveTimeout = setTimeout(function () {
+                                    _this._GS.saveFileToDrive(_this.id, _this.editor.getValue());
+                                }, 2000);
+                            }
+                        });
+                    });
+                };
+                Editor.prototype.convertLanguage = function (desiredFormat, oldFormat) {
+                    var _this = this;
+                    if (!this.hasError) {
+                        this._languageService.convertLanguage(this.config.languages[this.language.id], oldFormat.format, desiredFormat.format, this.editor.getValue(), this.fileName)
+                            .subscribe(function (res) {
+                            if (status == 'OK') {
+                                var content = JSON.parse(res.data);
+                                console.log(content);
+                                _this.replaceEditorContent(content);
                             }
                         }, function (err) {
                             console.log(err);
                         });
                     }
-                };
-                Editor.prototype.setEditorHandlers = function () {
-                    var _this = this;
-                    this.editor.on('change', function (content) {
-                        if (_this.saveTimeout !== null) {
-                            clearTimeout(_this.saveTimeout);
-                        }
-                        _this.saveTimeout = setTimeout(function () {
-                            _this._GS.saveFileToDrive(_this.id, _this.editor.getValue());
-                        }, 2000);
-                    });
                 };
                 __decorate([
                     core_1.Input(), 

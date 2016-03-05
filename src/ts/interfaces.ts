@@ -38,7 +38,7 @@ export interface IFormat {
 export interface IOperation {
     id: string,
     name: string,
-    _remoteExecution: string,  //should be boolean
+    _remoteExecution: string,  // It is a bool string. eg "true"
     data: Object,
     action: string;
 }

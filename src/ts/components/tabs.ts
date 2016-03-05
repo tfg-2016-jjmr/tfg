@@ -22,6 +22,7 @@ export class Tabs implements OnInit{
         console.log('toolbar initialised');
         console.log(this.tabs);
         this.selectedFormat = 'iagree';
+        $(window).trigger('resize');
     }
 
     setSelectedTab($event,  language: string): void{

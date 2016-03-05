@@ -27,6 +27,7 @@ System.register(["angular2/core"], function(exports_1) {
                     console.log('toolbar initialised');
                     console.log(this.tabs);
                     this.selectedFormat = 'iagree';
+                    $(window).trigger('resize');
                 };
                 Tabs.prototype.setSelectedTab = function ($event, language) {
                     $event.preventDefault();

@@ -26,41 +26,10 @@ export class Editor implements OnInit, OnChanges {
     saveTimeout;
     fileName: string;
     selectedFormat: IFormat;
+    oldFormat: IFormat;
+    hasError: boolean;
 
     constructor(public http: Http, private _GS: GoogleService, private _languageService: LanguageService) {}
-
-    ngOnInit(){
-        //setInterval(()=>{console.log(this.format)}, 2000);
-        console.log('EDITOR Initialised');
-        this.initAce();
-        this._GS.authorize().then(
-            () => {
-                console.log('yahooo en el constructor con ide: '+ this.id);
-                this._GS.loadDriveFile(this.id).then(
-                    (file: Object) => {
-                        console.log(file);
-                        this.fileName = file.title;
-                        this.fileNameChange.next(this.fileName);
-                        this.fileExtension.next(file.fileExtension);
-                        this._GS.getFileContent(file.downloadUrl)
-                            .map(res => res.text())
-                            .subscribe(
-                                (content) => {
-                                    console.log('succes getting file content');
-                                    this.replaceEditorContent(content);
-                                    this.checkLanguage();
-                                    this.setEditorHandlers();
-                                },
-                                (err) => {
-                                    console.log('error getting file content');
-                                }
-                            )
-                    }
-                )
-
-            }
-        );
-    }
 
     ngOnChanges(changes: {[propName: string]: SimpleChange}) {
         if (changes['language'] && typeof changes["language"].currentValue !== 'undefined') {
@@ -68,10 +37,42 @@ export class Editor implements OnInit, OnChanges {
             //let newLang: ILanguage = changes["language"].currentValue;
             this.setEditorParameters(this.language.formats[0]);
         }
-    }
 
-    processLanguage() {
+        if (changes['selectedFormat'] && typeof changes["selectedFormat"].currentValue !== 'undefined') {
+            this.oldFormat = changes["selectedFormat"].previousValue;
+            this.convertLanguage(this.selectedFormat, this.oldFormat);
+        }
+        if (changes["id"]) {
+            console.log('EDITOR Initialised');
+            this.initAce();
+            this._GS.authorize().then(
+                () => {
+                    console.log('yahooo en el constructor con ide: ' + this.id);
+                    this._GS.loadDriveFile(this.id).then(
+                        (file:Object) => {
+                            console.log(file);
+                            this.fileName = file.title;
+                            this.fileNameChange.next(this.fileName);
+                            this.fileExtension.next(file.fileExtension);
+                            this._GS.getFileContent(file.downloadUrl)
+                                .map(res => res.text())
+                                .subscribe(
+                                    (content) => {
+                                        console.log('succes getting file content');
+                                        this.replaceEditorContent(content);
+                                        this.checkLanguage();
+                                        this.setEditorHandlers();
+                                    },
+                                    (err) => {
+                                        console.log('error getting file content');
+                                    }
+                                )
+                        }
+                    )
 
+                }
+            );
+        }
     }
 
     setAnnotations(annotations) {
@@ -109,36 +110,65 @@ export class Editor implements OnInit, OnChanges {
     }
 
     checkLanguage(){
-        if (this.selectedFormat.checkLanguage){
+        return new Promise((resolve, reject) => {
             this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
-               .subscribe(
-                   (data: IAnnotations) => {
-                       console.log(data);
-                       if (data.status === 'OK'){
-                            console.log('No errors in this file. Yahooooo!')
-                       } else {
+                .subscribe(
+                    (data: IAnnotations) => {
+                        console.log(data);
+                        if (data.status === 'OK'){
+                            console.log('No errors in this file. Yahooooo!');
+                            this.hasError = false;
+                        } else {
                             this.setAnnotations(data.annotations);
-                       }
-                   },
-                   (err) => {
-                       console.log(err);
-                   }
-               );
-        }
+                            this.hasError = true;
+                        }
+                        resolve();
+                    },
+                    (err) => {
+                        console.log(err);
+                        reject();
+                    }
+                );
+        });
     }
 
 
     setEditorHandlers() {
         this.editor.on('change', (content) => {
-            if (this.saveTimeout !== null) {
-                clearTimeout(this.saveTimeout);
-            }
+            // If after checking language there is no error we can save.
+            if (!this.selectedFormat.checkLanguage)
+                return;
 
-            this.saveTimeout = setTimeout(
-                () => {
-                    this._GS.saveFileToDrive(this.id, this.editor.getValue());
+            this.checklanguage().then(() => {
+                if(!this.hasError){
+                    if (this.saveTimeout !== null) {
+                        clearTimeout(this.saveTimeout);
+                    }
+
+                    this.saveTimeout = setTimeout(() => {
+                            this._GS.saveFileToDrive(this.id, this.editor.getValue());
+                        }, 2000);
                 }
-                , 2000);
+            })
         });
+    }
+
+    convertLanguage(desiredFormat: IFormat, oldFormat: IFormat){
+        if(!this.hasError){
+            this._languageService.convertLanguage(this.config.languages[this.language.id], oldFormat.format, desiredFormat.format, this.editor.getValue(), this.fileName)
+                .subscribe(
+                    (res: IAnnotations) => {
+                        if(status == 'OK'){
+                            let content = JSON.parse(res.data);
+                            console.log(content);
+                            this.replaceEditorContent(content);
+                        }
+
+                    },
+                    (err) => {
+                        console.log(err);
+                    }
+                )
+        }
     }
 }
