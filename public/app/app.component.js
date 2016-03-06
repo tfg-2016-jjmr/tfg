@@ -101,8 +101,32 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                             console.log(err);
                         });
                     });
+                    //let loadUser = null;
+                    var loadUser = new Promise(function (resolve, reject) {
+                        _this._GS.authorize().then(function (token) {
+                            console.log('authorized to get user');
+                            _this._GS.getUserInfo('me')
+                                .then(function (user) {
+                                console.log('user returned');
+                                console.log(user);
+                                _this.setUser(user.email, user.displayName, user.picture);
+                                resolve();
+                            }, function () {
+                                console.log('fail loading ');
+                                reject();
+                            });
+                            // this.loaded = true;
+                        }, function (err) {
+                            console.log(err);
+                            reject();
+                            // this.loaded = true;
+                        });
+                    });
                     //Promise.all([loadContent, getConfigLang]).then(() => {
-                    Promise.all([getConfigLang]).then(function () {
+                    Promise.all([
+                        getConfigLang,
+                        loadUser
+                    ]).then(function () {
                         console.log("todo listo, calisto");
                         console.log(_this.languages);
                         console.log(_this.fileExtension);

@@ -3,7 +3,7 @@
 		<div class="nav-wrapper">
 			<a href="#!" class="brand-logo">{{ fileName }}</a>
 			<!-- <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a> -->
-			<ul class="right hide-on-med-and-down" *ngIf="user" >
+			<ul class="right" *ngIf="user" >
 				<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
 				<!--<li><a href="#"><i class="material-icons">search</i></a></li>-->
 				<!--<li><img src="/img/apple.png" class="left circle icon-32"></img></li>-->
@@ -14,9 +14,9 @@
 					<!--</div>-->
 
 					<div class="user-wrapper">
-						<div class="user-info">
+						<span class="user-info hide-on-med-and-down">
 							{{ user.email }}
-						</div>
+						</span>
 						<img src="{{ user.picture }}" alt="Contact Person">
 					</div>
 				</li>

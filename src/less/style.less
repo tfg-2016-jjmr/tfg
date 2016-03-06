@@ -47,31 +47,27 @@ nav {
     //height: 56px;
 
     .user-wrapper{
-        box-sizing: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        display: inline-block;
-        height: 32px;
         font-size: 13px;
         font-weight: 500;
         color: rgba(0,0,0,0.6);
-        line-height: 32px;
-        padding: 16px 12px;
-        //margin: 16px;
+        @media only screen and (max-width : 600px) { height: 54px; }
+        @media only screen and (min-width : 601px) { height: 64px; }
 
-        .user-info{
-            .vertical-align();
-            display: inline-block;
+        span{
             font-weight: normal;
-
             color: #ffffff;
             font-size: 13px;
-            line-height: 16px;
             max-width: 100%;
             opacity: .7;
             overflow: hidden;
             text-overflow: ellipsis;
             transition: opacity .2s;
             white-space: nowrap;
+            margin-right: 8px;
         }
         img{
             border-radius: 50%;

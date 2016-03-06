@@ -42,7 +42,7 @@ export class AppComponent implements OnInit{
 
         this.languages = {};
 
-        var getConfigLang =  new Promise ((resolve, reject) => {
+        let getConfigLang =  new Promise ((resolve, reject) => {
             this.http.get('/api/configuration')
                 .map(res => res.json())
                 .subscribe(
@@ -107,9 +107,39 @@ export class AppComponent implements OnInit{
                     })
         });
 
+        //let loadUser = null;
+        let loadUser = new Promise((resolve, reject) => {
+            this._GS.authorize().then(
+                (token) => {
+                    console.log('authorized to get user');
+                    this._GS.getUserInfo('me')
+                        .then(
+                            (user:IUser) => {
+                                console.log('user returned');
+                                console.log(user);
+                                this.setUser(user.email, user.displayName, user.picture)
+                                resolve();
+                            },
+                            () => {
+                                console.log('fail loading ');
+                                reject()
+                            }
+                        );
+
+                    // this.loaded = true;
+                },
+                (err) => {
+                    console.log(err);
+                    reject();
+                    // this.loaded = true;
+                });
+        });
 
         //Promise.all([loadContent, getConfigLang]).then(() => {
-        Promise.all([getConfigLang]).then(() => {
+        Promise.all([
+            getConfigLang,
+            loadUser
+        ]).then(() => {
             console.log("todo listo, calisto");
             console.log(this.languages);
             console.log(this.fileExtension);
@@ -123,12 +153,6 @@ export class AppComponent implements OnInit{
             //this.setEditorHandlers();
             //this.setEditorParameters();
         });
-
-
-        
-
-
-
 
     }
 
