@@ -61,8 +61,8 @@ export class Editor implements OnChanges {
                                     (content) => {
                                         console.log('succes getting file content');
                                         this.replaceEditorContent(content);
-                                        console.log(this.checkLanguage);
-                                        this.checkLanguage();
+                                        console.log(this.checkEditorLanguage);
+                                        this.checkEditorLanguage();
                                         this.setEditorHandlers();
                                     },
                                     (err) => {
@@ -111,7 +111,7 @@ export class Editor implements OnChanges {
         }
     }
 
-    checkLanguage() : Promise<void> {
+    checkEditorLanguage() : Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
                 .subscribe(
@@ -141,7 +141,7 @@ export class Editor implements OnChanges {
             if (!this.selectedFormat.checkLanguage)
                 return;
 
-            this.checklanguage().then(() => {
+            this.checkEditorLanguage().then(() => {
                 if(!this.hasError){
                     if (this.saveTimeout !== null) {
                         clearTimeout(this.saveTimeout);

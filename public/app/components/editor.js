@@ -64,8 +64,8 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                                     .subscribe(function (content) {
                                     console.log('succes getting file content');
                                     _this.replaceEditorContent(content);
-                                    console.log(_this.checkLanguage);
-                                    _this.checkLanguage();
+                                    console.log(_this.checkEditorLanguage);
+                                    _this.checkEditorLanguage();
                                     _this.setEditorHandlers();
                                 }, function (err) {
                                     console.log('error getting file content');
@@ -101,7 +101,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                         this.editor.getSession().setMode(this.selectedFormat.editorModeId);
                     }
                 };
-                Editor.prototype.checkLanguage = function () {
+                Editor.prototype.checkEditorLanguage = function () {
                     var _this = this;
                     return new Promise(function (resolve, reject) {
                         _this._languageService.postCheckLanguage(_this.config.languages[_this.language.id], _this.selectedFormat.format, _this.editor.getValue(), _this.fileName)
@@ -128,7 +128,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                         // If after checking language there is no error we can save.
                         if (!_this.selectedFormat.checkLanguage)
                             return;
-                        _this.checklanguage().then(function () {
+                        _this.checkEditorLanguage().then(function () {
                             if (!_this.hasError) {
                                 if (_this.saveTimeout !== null) {
                                     clearTimeout(_this.saveTimeout);
