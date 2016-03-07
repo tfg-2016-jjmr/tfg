@@ -20,27 +20,30 @@ System.register(["angular2/core"], function(exports_1) {
                 function Tabs() {
                     this.changeTab = new core_1.EventEmitter();
                 }
-                Tabs.prototype.addTab = function (tab) {
-                    this.tabs.push(tab);
-                };
-                Tabs.prototype.ngOnChanges = function (changes) {
-                    if (changes['tabs'] && typeof changes["tabs"].currentValue !== 'undefined') {
-                        console.log('toolbar initialised');
-                        console.log(this.tabs);
-                        this.selectedFormat = 'iagree';
-                    }
-                };
-                Tabs.prototype.ngOnInit = function () {
-                };
+                //selectedTab: string;
+                //ngOnChanges(changes: {[propName: string]: SimpleChange}) {
+                //    //if (changes['tabs'] && typeof changes["tabs"].currentValue !== 'undefined') {
+                //    //    console.log('toolbar initialised');
+                //    //    console.log(this.tabs);
+                //    //    //$('ul.tabs').tabs();
+                //    //    //$('ul.tabs').tabs('select_tab', this.selectedFormat);
+                //    //    //this.selectedFormat = 'iagree';
+                //    //}
+                //
+                //    if (changes['selectedFormat']) {
+                //        console.log(this.selectedFormat);
+                //    }
+                //
+                //}
                 Tabs.prototype.setSelectedTab = function ($event, language) {
                     $event.preventDefault();
-                    if (this.selectedTab === language)
+                    if (this.selectedFormat === language)
                         return;
-                    this.selectedTab = language;
+                    //this.selectedTab = language;
                     this.selectedFormat = language;
-                    console.log(this.selectedTab);
+                    console.log(this.selectedFormat);
                     //this.changeTab.next(this.selectedTab);
-                    this.changeTab.emit(this.selectedTab);
+                    this.changeTab.emit(this.selectedFormat);
                 };
                 __decorate([
                     core_1.Input(), 

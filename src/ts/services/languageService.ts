@@ -32,20 +32,21 @@ export class LanguageService {
             .catch(this.handleError);
     }
 
-    convertLanguage(LanguageId: string, currentFormat: string, desiredFormat: string, content: string, fileUri: string ){
+    convertLanguage(languageId: string, currentFormat: string, desiredFormat: string, content: string, fileUri: string ){
         let url = '/api/convert' + languageId;
         let body =  'currentFormat='+currentFormat +
                     '&desiredFormat='+ desiredFormat +
-                    '&fileUri='+ fileUri +
-                    '&content='+ content;
-
+                    '&fileUri='+ '' +
+                    '&content='+ encodeURIComponent(content);
+        console.log(url);
+        console.log(body);
         let headers = new Headers();
             headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             headers.append('accept', 'application/json');
         let options = {
             headers: headers
         };
-
+        console.log(headers);
         return this.http.post(url, body, options)
             .map(res => res.json())
             .catch(this.handleError);

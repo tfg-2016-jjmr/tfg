@@ -41,9 +41,25 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     this.http = http;
                     this._languageService = _languageService;
                     this._GS = _GS;
+                    /**
+                     * The app title that will hold the file name.
+                     * @type {string}
+                     */
                     this.fileName = 'Governify';
+                    /**
+                     * True when the application has loaded all the initial components.
+                     * @type {boolean}
+                     */
                     this.loaded = false;
+                    /**
+                     * Define the selected tab from [Tabs] web component.
+                     * @type {string}
+                     */
                     this.selectedFormat = '';
+                    /**
+                     * Different extensions on the [languageSettings] used on [Tabs] to create every tab.
+                     * @type {string[]}
+                     */
                     this.extensions = [''];
                     $('body').removeClass('unresolved');
                     this.languages = {};
@@ -68,40 +84,11 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                                     return d;
                                 })());
                             });
-                            // aLenguagesDeferred.push((() => {
-                            //     let d = new Promise((resolve, reject) => {
-                            //         this._GS.authorize().then(
-                            //             (token) => {
-                            //                 console.log('authorized to get user');
-                            //                 this._GS.getUserInfo('me')
-                            //                     .then(
-                            //                     (user: IUser) => {
-                            //                         console.log('user returned');
-                            //                         console.log(user);
-                            //                         // this.setUser(user.email, user.displayName, user.picture)
-                            //                         resolve();
-                            //                     },
-                            //                     () => {
-                            //                         console.log('fail loading ')
-                            //                         reject()
-                            //                     }
-                            //                     );
-                            //                 // this.loaded = true;
-                            //             },
-                            //             (err) => {
-                            //                 console.log(err);
-                            //                 // this.loaded = true;
-                            //             }
-                            //         )
-                            //         return d;
-                            //     })
-                            // })());
                             Promise.all(aLenguagesDeferred).then(function () { return resolve(); }, function () { return reject(); });
                         }, function (err) {
                             console.log(err);
                         });
                     });
-                    //let loadUser = null;
                     var loadUser = new Promise(function (resolve, reject) {
                         _this._GS.authorize().then(function (token) {
                             console.log('authorized to get user');
@@ -115,40 +102,18 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                                 console.log('fail loading ');
                                 reject();
                             });
-                            // this.loaded = true;
                         }, function (err) {
                             console.log(err);
                             reject();
-                            // this.loaded = true;
                         });
                     });
-                    //Promise.all([loadContent, getConfigLang]).then(() => {
                     Promise.all([
                         getConfigLang,
                         loadUser
                     ]).then(function () {
-                        console.log("todo listo, calisto");
-                        console.log(_this.languages);
-                        console.log(_this.fileExtension);
                         _this.fileId = _this.getUrlParameters('ids');
-                        console.log(_this.fileId);
-                        console.log(_this.extensions);
-                        //    this.initAce();
-                        //this.replaceEditorContent(this.fileContent);
-                        //this.setEditorHandlers();
-                        //this.setEditorParameters();
                     });
                 }
-                AppComponent.prototype.ngOnInit = function () {
-                    //setTimeout(() => {
-                    //    $('ul.tabs').tabs();
-                    console.log('hola4554654645');
-                    //$('ul.tabs').tabs('select_tab', 'iagree');
-                    //}, 5000);
-                    //for(let ex in this.extensions){
-                    //    Tabs.addTab(ex);
-                    //}
-                };
                 AppComponent.prototype.getUrlParameters = function (param) {
                     var result = null, query = window.location.search, map = {}, state;
                     console.log("param: " + param);
@@ -182,10 +147,6 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                         picture: picture
                     };
                 };
-                AppComponent.prototype.setSelectedFormat = function (e) {
-                    console.log('Yayyyyyy tab has changed to ' + e);
-                    console.log(e);
-                };
                 AppComponent.prototype.extensionSelectedEvent = function (ext) {
                     this.languageSettings = this.languages[ext];
                     console.log(ext);
@@ -197,15 +158,25 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                         console.log(f.format);
                         this.extensions.push(f.format);
                     }
-                    this.selectedFormat = ext;
+                    this.selectedFormat = this.extensions[0];
                     $('ul.tabs').tabs();
-                    $('ul.tabs').tabs('select_tab', formats[0].format);
+                    //$('ul.tabs').tabs('select_tab', formats[0].format);
                     setTimeout(function () { return $(window).trigger('resize'); }, 100);
                 };
                 AppComponent.prototype.fileNameChangedEvent = function (fileName) {
                     console.log(fileName);
                     this.fileName = fileName;
                     this.loaded = true;
+                };
+                AppComponent.prototype.changeSelectedFormatEvent = function (formatId) {
+                    for (var _i = 0, _a = this.languageSettings.formats; _i < _a.length; _i++) {
+                        var f = _a[_i];
+                        if (f.format === formatId) {
+                            console.log(this.languageSettings);
+                            this.selectedFormat = f.format;
+                            break;
+                        }
+                    }
                 };
                 AppComponent = __decorate([
                     core_1.Component({

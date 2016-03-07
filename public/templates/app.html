@@ -30,7 +30,10 @@
 	<tabs *ngIf="loaded &&
 	             extensions != null &&
 	             extensions?.length > 0 &&
-	             selectedFormat != null" [tabs]="extensions" [selectedFormat]='selectedFormat' ></tabs>
+	             selectedFormat != null"
+	      [tabs]="extensions"
+	      [selectedFormat]='selectedFormat'
+	      (changeTab)="changeSelectedFormatEvent($event)"></tabs>
 </div>
 
 <div class="progress light-blue" style="margin:0;" *ngIf="!loaded">

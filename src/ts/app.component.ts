@@ -24,17 +24,62 @@ import {Editor} from './components/editor';
     providers: [GoogleService]
 })
 export class AppComponent implements OnInit{
+    /**
+     * The logged user's information. Contains the user's avatar and contact info.
+     * @type {IUser}
+     */
     user: IUser;
+    /**
+     * Instance of the ACE editor.
+     */
     editor: any;
+    /**
+     * The app title that will hold the file name.
+     * @type {string}
+     */
     fileName: string  = 'Governify';
+    /**
+     * File id that comes from the URL parameter. It's used on the [Editor] component for retrieving
+     * the file's content.
+     * @type {string}
+     */
     fileId: string;
+    /**
+     * The loading file's extension. This attribute is received from the [Editor] component and
+     * it's used for loading the [extensions] tabs.
+     * @type {string}
+     */
     fileExtension: string;
     fileContent: string;
+    /**
+     * True when the application has loaded all the initial components.
+     * @type {boolean}
+     */
     loaded: boolean = false;
+    /**
+     * Initial app configuration containing the manifests of all the [languages].
+     * @type {IConfiguration}
+     */
     configuration: IConfiguration;
+    /**
+     * Languages contained on [configuration]. It's a map which keys are file's extensions.
+     * @type {Map<string, ILanguage>}
+     */
     languages: { [key:string]: ILanguage };
+    /**
+     * Define the selected tab from [Tabs] web component.
+     * @type {string}
+     */
     selectedFormat: string = '';
+    /**
+     * Different extensions on the [languageSettings] used on [Tabs] to create every tab.
+     * @type {string[]}
+     */
     extensions: string[] = [''];
+    /**
+     * Language of the loaded file retrieved from [languages].
+     * @type {ILanguage}
+     */
     languageSettings: ILanguage;
 
     constructor(public http: Http, private _languageService: LanguageService, private _GS: GoogleService) {
@@ -68,46 +113,13 @@ export class AppComponent implements OnInit{
 
                     });
 
-                    // aLenguagesDeferred.push((() => {
-                    //     let d = new Promise((resolve, reject) => {
-                    //         this._GS.authorize().then(
-                    //             (token) => {
-                    //                 console.log('authorized to get user');
-                    //                 this._GS.getUserInfo('me')
-                    //                     .then(
-                    //                     (user: IUser) => {
-                    //                         console.log('user returned');
-                    //                         console.log(user);
-
-                    //                         // this.setUser(user.email, user.displayName, user.picture)
-                    //                         resolve();
-                    //                     },
-                    //                     () => {
-                    //                         console.log('fail loading ')
-                    //                         reject()
-                    //                     }
-                    //                     );
-
-                    //                 // this.loaded = true;
-                    //             },
-                    //             (err) => {
-                    //                 console.log(err);
-                    //                 // this.loaded = true;
-                    //             }
-                    //         )
-                    //         return d;
-                    //     })
-                    // })());
-
-
-                        Promise.all(aLenguagesDeferred).then(() => resolve(), ()=> reject());
-                    },
-                    (err) => {
-                        console.log(err);
-                    })
+                    Promise.all(aLenguagesDeferred).then(() => resolve(), ()=> reject());
+                },
+                (err) => {
+                    console.log(err);
+                })
         });
 
-        //let loadUser = null;
         let loadUser = new Promise((resolve, reject) => {
             this._GS.authorize().then(
                 (token) => {
@@ -125,46 +137,20 @@ export class AppComponent implements OnInit{
                                 reject()
                             }
                         );
-
-                    // this.loaded = true;
                 },
                 (err) => {
                     console.log(err);
                     reject();
-                    // this.loaded = true;
                 });
         });
 
-        //Promise.all([loadContent, getConfigLang]).then(() => {
         Promise.all([
             getConfigLang,
             loadUser
         ]).then(() => {
-            console.log("todo listo, calisto");
-            console.log(this.languages);
-            console.log(this.fileExtension);
             this.fileId = this.getUrlParameters('ids');
-            console.log(this.fileId);
-
-
-            console.log(this.extensions);
-            //    this.initAce();
-            //this.replaceEditorContent(this.fileContent);
-            //this.setEditorHandlers();
-            //this.setEditorParameters();
         });
 
-    }
-
-    ngOnInit(){
-        //setTimeout(() => {
-        //    $('ul.tabs').tabs();
-            console.log('hola4554654645');
-            //$('ul.tabs').tabs('select_tab', 'iagree');
-        //}, 5000);
-        //for(let ex in this.extensions){
-        //    Tabs.addTab(ex);
-        //}
     }
 
     getUrlParameters(param) {
@@ -206,11 +192,6 @@ export class AppComponent implements OnInit{
         };
     }
 
-    setSelectedFormat(e){
-        console.log('Yayyyyyy tab has changed to ' + e);
-        console.log(e);
-    }
-
     extensionSelectedEvent(ext: string) {
         this.languageSettings = this.languages[ext];
         console.log(ext);
@@ -221,9 +202,9 @@ export class AppComponent implements OnInit{
             console.log(f.format);
             this.extensions.push(f.format);
         }
-        this.selectedFormat = ext;
+        this.selectedFormat = this.extensions[0];
         $('ul.tabs').tabs();
-        $('ul.tabs').tabs('select_tab', formats[0].format);
+        //$('ul.tabs').tabs('select_tab', formats[0].format);
         setTimeout(() => $(window).trigger('resize'), 100);
     }
 
@@ -231,5 +212,16 @@ export class AppComponent implements OnInit{
         console.log(fileName);
         this.fileName = fileName;
         this.loaded = true;
+    }
+
+    changeSelectedFormatEvent( formatId: string) : void {
+        for(let f of this.languageSettings.formats) {
+            if(f.format === formatId) {
+                console.log(this.languageSettings);
+                this.selectedFormat = f.format;
+                break;
+            }
+        }
+
     }
 }

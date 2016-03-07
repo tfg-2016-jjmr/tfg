@@ -38,9 +38,19 @@ export class Editor implements OnChanges {
             this.setEditorParameters(this.language.formats[0]);
         }
 
-        if (changes['selectedFormat'] && typeof changes["selectedFormat"].currentValue !== 'undefined') {
-            this.oldFormat = changes["selectedFormat"].previousValue;
-            this.convertLanguage(this.selectedFormat, this.oldFormat);
+        if (changes['format'] && (changes["format"].previousValue != '' || changes["format"].currentValue != '')) {
+            console.log('changed format');
+            console.log(changes["format"].previousValue);
+            console.log(changes["format"].currentValue);
+
+
+            this.oldFormat = changes["format"].previousValue;
+
+            console.log(this.oldFormat);
+            console.log(this.format);
+
+            if (this.config != undefined)
+                this.convertLanguage(this.format, this.oldFormat);
         }
         if (changes["id"] && typeof changes["id"].currentValue !== 'undefined' && changes["id"].currentValue !== "") {
             console.log('EDITOR Initialised');
@@ -155,9 +165,21 @@ export class Editor implements OnChanges {
         });
     }
 
-    convertLanguage(desiredFormat: IFormat, oldFormat: IFormat){
+    convertLanguage(desiredFormat: string, oldFormat: string){
+        console.log('++++++++++++++++++++++++++++++++ in convert language')
+        //console.log(oldFormat);
+        //console.log(desiredFormat);
+
+
+        let langId = this.config.languages[this.language.id],
+            content = this.editor.getValue();
+
+        console.log(langId);
+        console.log(content);
+
         if(!this.hasError){
-            this._languageService.convertLanguage(this.config.languages[this.language.id], oldFormat.format, desiredFormat.format, this.editor.getValue(), this.fileName)
+            console.log(this.config);
+            this._languageService.convertLanguage(langId, oldFormat, desiredFormat, content, this.fileName)
                 .subscribe(
                     (res: IAnnotations) => {
                         if(status == 'OK'){
@@ -171,6 +193,8 @@ export class Editor implements OnChanges {
                         console.log(err);
                     }
                 )
+        }else{
+            console.log('no me ejecuto pq tengo error');
         }
     }
 }

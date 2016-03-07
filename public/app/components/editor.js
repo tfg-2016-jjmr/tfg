@@ -44,9 +44,15 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                         //let newLang: ILanguage = changes["language"].currentValue;
                         this.setEditorParameters(this.language.formats[0]);
                     }
-                    if (changes['selectedFormat'] && typeof changes["selectedFormat"].currentValue !== 'undefined') {
-                        this.oldFormat = changes["selectedFormat"].previousValue;
-                        this.convertLanguage(this.selectedFormat, this.oldFormat);
+                    if (changes['format'] && (changes["format"].previousValue != '' || changes["format"].currentValue != '')) {
+                        console.log('changed format');
+                        console.log(changes["format"].previousValue);
+                        console.log(changes["format"].currentValue);
+                        this.oldFormat = changes["format"].previousValue;
+                        console.log(this.oldFormat);
+                        console.log(this.format);
+                        if (this.config != undefined)
+                            this.convertLanguage(this.format, this.oldFormat);
                     }
                     if (changes["id"] && typeof changes["id"].currentValue !== 'undefined' && changes["id"].currentValue !== "") {
                         console.log('EDITOR Initialised');
@@ -142,17 +148,27 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                 };
                 Editor.prototype.convertLanguage = function (desiredFormat, oldFormat) {
                     var _this = this;
+                    console.log('++++++++++++++++++++++++++++++++ in convert language');
+                    //console.log(oldFormat);
+                    //console.log(desiredFormat);
+                    var langId = this.config.languages[this.language.id], content = this.editor.getValue();
+                    console.log(langId);
+                    console.log(content);
                     if (!this.hasError) {
-                        this._languageService.convertLanguage(this.config.languages[this.language.id], oldFormat.format, desiredFormat.format, this.editor.getValue(), this.fileName)
+                        console.log(this.config);
+                        this._languageService.convertLanguage(langId, oldFormat, desiredFormat, content, this.fileName)
                             .subscribe(function (res) {
                             if (status == 'OK') {
-                                var content = JSON.parse(res.data);
-                                console.log(content);
-                                _this.replaceEditorContent(content);
+                                var content_1 = JSON.parse(res.data);
+                                console.log(content_1);
+                                _this.replaceEditorContent(content_1);
                             }
                         }, function (err) {
                             console.log(err);
                         });
+                    }
+                    else {
+                        console.log('no me ejecuto pq tengo error');
                     }
                 };
                 __decorate([

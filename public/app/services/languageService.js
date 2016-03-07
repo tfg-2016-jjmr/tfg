@@ -44,18 +44,21 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                         .map(function (res) { return res.json(); })
                         .catch(this.handleError);
                 };
-                LanguageService.prototype.convertLanguage = function (LanguageId, currentFormat, desiredFormat, content, fileUri) {
+                LanguageService.prototype.convertLanguage = function (languageId, currentFormat, desiredFormat, content, fileUri) {
                     var url = '/api/convert' + languageId;
                     var body = 'currentFormat=' + currentFormat +
                         '&desiredFormat=' + desiredFormat +
-                        '&fileUri=' + fileUri +
-                        '&content=' + content;
+                        '&fileUri=' + '' +
+                        '&content=' + encodeURIComponent(content);
+                    console.log(url);
+                    console.log(body);
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
                     headers.append('accept', 'application/json');
                     var options = {
                         headers: headers
                     };
+                    console.log(headers);
                     return this.http.post(url, body, options)
                         .map(function (res) { return res.json(); })
                         .catch(this.handleError);
