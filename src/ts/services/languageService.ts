@@ -35,14 +35,14 @@ export class LanguageService {
     convertLanguage(languageId: string, currentFormat: string, desiredFormat: string, content: string, fileUri: string ){
         let url = '/api/convert' + languageId;
         let body =  'currentFormat='+currentFormat +
-                    '&desiredFormat='+ desiredFormat +
-                    '&fileUri='+ '' +
-                    '&content='+ encodeURIComponent(content);
+            '&desiredFormat='+ desiredFormat +
+            '&fileUri='+ '' +
+            '&content='+ encodeURIComponent(content);
         console.log(url);
         console.log(body);
         let headers = new Headers();
-            headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-            headers.append('accept', 'application/json');
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        headers.append('accept', 'application/json');
         let options = {
             headers: headers
         };

@@ -44,15 +44,20 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                         //let newLang: ILanguage = changes["language"].currentValue;
                         this.setEditorParameters(this.language.formats[0]);
                     }
-                    if (changes['format'] && (changes["format"].previousValue != '' || changes["format"].currentValue != '')) {
-                        console.log('changed format');
-                        console.log(changes["format"].previousValue);
-                        console.log(changes["format"].currentValue);
-                        this.oldFormat = changes["format"].previousValue;
-                        console.log(this.oldFormat);
-                        console.log(this.format);
-                        if (this.config != undefined)
-                            this.convertLanguage(this.format, this.oldFormat);
+                    if (changes['format']) {
+                        if (Object.keys(changes['format'].previousValue).length > 0 && Object.keys(changes['format'].currentValue).length > 0
+                            || (changes['format'].currentValue != "" && changes['format'].previousValue != "")) {
+                            console.log('changed format');
+                            console.log(changes["format"].previousValue);
+                            console.log(typeof changes["format"].previousValue);
+                            console.log(changes["format"].currentValue);
+                            console.log(typeof changes["format"].currentValue);
+                            this.oldFormat = changes["format"].previousValue;
+                            console.log(this.oldFormat);
+                            console.log(this.format);
+                            if (this.config != undefined)
+                                this.convertLanguage(this.format, this.oldFormat);
+                        }
                     }
                     if (changes["id"] && typeof changes["id"].currentValue !== 'undefined' && changes["id"].currentValue !== "") {
                         console.log('EDITOR Initialised');
@@ -154,7 +159,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                     var langId = this.config.languages[this.language.id], content = this.editor.getValue();
                     console.log(langId);
                     console.log(content);
-                    if (!this.hasError) {
+                    if (!this.hasError /*&& content !== null && content !== ""*/) {
                         console.log(this.config);
                         this._languageService.convertLanguage(langId, oldFormat, desiredFormat, content, this.fileName)
                             .subscribe(function (res) {
@@ -168,7 +173,7 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                         });
                     }
                     else {
-                        console.log('no me ejecuto pq tengo error');
+                        console.log('Default format has errors!');
                     }
                 };
                 __decorate([

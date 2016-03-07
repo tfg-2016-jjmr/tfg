@@ -53,7 +53,7 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                     console.log(url);
                     console.log(body);
                     var headers = new http_1.Headers();
-                    headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+                    headers.append('Content-Type', 'application/x-www-form-urlencoded');
                     headers.append('accept', 'application/json');
                     var options = {
                         headers: headers

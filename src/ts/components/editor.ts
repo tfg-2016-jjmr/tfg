@@ -38,19 +38,24 @@ export class Editor implements OnChanges {
             this.setEditorParameters(this.language.formats[0]);
         }
 
-        if (changes['format'] && (changes["format"].previousValue != '' || changes["format"].currentValue != '')) {
-            console.log('changed format');
-            console.log(changes["format"].previousValue);
-            console.log(changes["format"].currentValue);
+        if (changes['format']) {
+            if (Object.keys(changes['format'].previousValue).length > 0 && Object.keys(changes['format'].currentValue).length > 0
+                || (changes['format'].currentValue != "" && changes['format'].previousValue != "")) {
+                console.log('changed format');
+                console.log(changes["format"].previousValue);
+                console.log(typeof changes["format"].previousValue);
+                console.log(changes["format"].currentValue);
+                console.log(typeof changes["format"].currentValue);
 
 
-            this.oldFormat = changes["format"].previousValue;
+                this.oldFormat = changes["format"].previousValue;
 
-            console.log(this.oldFormat);
-            console.log(this.format);
+                console.log(this.oldFormat);
+                console.log(this.format);
 
-            if (this.config != undefined)
-                this.convertLanguage(this.format, this.oldFormat);
+                if (this.config != undefined)
+                    this.convertLanguage(this.format, this.oldFormat);
+            }
         }
         if (changes["id"] && typeof changes["id"].currentValue !== 'undefined' && changes["id"].currentValue !== "") {
             console.log('EDITOR Initialised');
@@ -166,10 +171,9 @@ export class Editor implements OnChanges {
     }
 
     convertLanguage(desiredFormat: string, oldFormat: string){
-        console.log('++++++++++++++++++++++++++++++++ in convert language')
+        console.log('++++++++++++++++++++++++++++++++ in convert language');
         //console.log(oldFormat);
         //console.log(desiredFormat);
-
 
         let langId = this.config.languages[this.language.id],
             content = this.editor.getValue();
@@ -177,7 +181,7 @@ export class Editor implements OnChanges {
         console.log(langId);
         console.log(content);
 
-        if(!this.hasError){
+        if(!this.hasError /*&& content !== null && content !== ""*/) {
             console.log(this.config);
             this._languageService.convertLanguage(langId, oldFormat, desiredFormat, content, this.fileName)
                 .subscribe(
@@ -194,7 +198,7 @@ export class Editor implements OnChanges {
                     }
                 )
         }else{
-            console.log('no me ejecuto pq tengo error');
+            console.log('Default format has errors!');
         }
     }
 }
