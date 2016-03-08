@@ -77,7 +77,7 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                                             _this.languages[lang.extension] = lang;
                                             resolve();
                                         }, function (err) {
-                                            console.log(err);
+                                            console.error(err);
                                             reject();
                                         });
                                     });
@@ -86,24 +86,20 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                             });
                             Promise.all(aLenguagesDeferred).then(function () { return resolve(); }, function () { return reject(); });
                         }, function (err) {
-                            console.log(err);
+                            console.error(err);
                         });
                     });
                     var loadUser = new Promise(function (resolve, reject) {
                         _this._GS.authorize().then(function (token) {
-                            console.log('authorized to get user');
                             _this._GS.getUserInfo('me')
                                 .then(function (user) {
-                                console.log('user returned');
-                                console.log(user);
                                 _this.setUser(user.email, user.displayName, user.picture);
                                 resolve();
                             }, function () {
-                                console.log('fail loading ');
                                 reject();
                             });
                         }, function (err) {
-                            console.log(err);
+                            console.error(err);
                             reject();
                         });
                     });
@@ -116,14 +112,10 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                 }
                 AppComponent.prototype.getUrlParameters = function (param) {
                     var result = null, query = window.location.search, map = {}, state;
-                    console.log("param: " + param);
-                    console.log('query: ' + query);
                     if (param === null || query === '') {
-                        console.log('source is empty');
                         return result;
                     }
                     var groups = query.substr(1).split("&");
-                    console.log(groups);
                     for (var i in groups) {
                         i = groups[i].split("=");
                         map[decodeURIComponent(i[0])] = decodeURIComponent(i[1]);
@@ -137,7 +129,6 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                             result = value;
                         }
                     }
-                    console.log(result);
                     return result;
                 };
                 AppComponent.prototype.setUser = function (email, displayname, picture) {
@@ -149,13 +140,10 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                 };
                 AppComponent.prototype.extensionSelectedEvent = function (ext) {
                     this.languageSettings = this.languages[ext];
-                    console.log(ext);
-                    console.log(this.languageSettings);
                     var formats = this.languageSettings.formats;
                     this.extensions = [];
                     for (var _i = 0; _i < formats.length; _i++) {
                         var f = formats[_i];
-                        console.log(f.format);
                         this.extensions.push(f.format);
                     }
                     this.selectedFormat = this.extensions[0];
@@ -164,7 +152,6 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     setTimeout(function () { return $(window).trigger('resize'); }, 100);
                 };
                 AppComponent.prototype.fileNameChangedEvent = function (fileName) {
-                    console.log(fileName);
                     this.fileName = fileName;
                     this.loaded = true;
                 };
@@ -172,7 +159,6 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     for (var _i = 0, _a = this.languageSettings.formats; _i < _a.length; _i++) {
                         var f = _a[_i];
                         if (f.format === formatId) {
-                            console.log(this.languageSettings);
                             this.selectedFormat = f.format;
                             break;
                         }

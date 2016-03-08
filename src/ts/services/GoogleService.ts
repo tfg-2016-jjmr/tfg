@@ -50,10 +50,8 @@ export class GoogleService {
                         config['immediate'] = false;
                         gapi.auth.authorize(config, (token) => {
                             if (token && !token.error) {
-                                console.log('Authorization completed');
                                 resolve(token);
                             } else {
-                                console.log("Authorization error");
                                 reject();
                             }
                         });
@@ -90,8 +88,6 @@ export class GoogleService {
                 });
 
                 request.execute((resp) => {
-                    console.log('user');
-                    console.log(resp);
                     user = {
                         email: resp.emails[0].value,
                         displayName: resp.displayName,

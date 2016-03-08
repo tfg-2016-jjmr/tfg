@@ -50,15 +50,12 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                         '&desiredFormat=' + desiredFormat +
                         '&fileUri=' + '' +
                         '&content=' + encodeURIComponent(content);
-                    console.log(url);
-                    console.log(body);
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/x-www-form-urlencoded');
                     headers.append('accept', 'application/json');
                     var options = {
                         headers: headers
                     };
-                    console.log(headers);
                     return this.http.post(url, body, options)
                         .map(function (res) { return res.json(); })
                         .catch(this.handleError);
@@ -66,7 +63,6 @@ System.register(['angular2/core', 'angular2/http', "rxjs/Observable"], function(
                 LanguageService.prototype.handleError = function (error) {
                     // in a real world app, we may send the server to some remote logging infrastructure
                     // instead of just logging it to the console
-                    console.error(error);
                     // return Observable.throw(error.json().error || 'Server error');
                     return Observable_1.Observable.throw('Server error');
                 };

@@ -87,7 +87,7 @@ router.post('/checklanguage/:language/format/:format', function(req, res, next) 
 		request = https.request(options, function(response) {
 			response.on('data', function(d) {
 				try {
-					var data = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d)));
+					var data = JSON.parse(d.toString());
 					res.json(data);
 				} catch (e) {
 					console.log(e);
@@ -105,10 +105,6 @@ router.post('/checklanguage/:language/format/:format', function(req, res, next) 
 
 
 router.post('/convert/:language', function(req, res, next) {
-	console.log('imprime estooo');
-	console.log(req);
-	console.log(req.body);
-	//req.body.content = encodeURIComponent(req.body.content);
 	var data = querystring.stringify(req.body),
 		options = {
 			host: 'labs.isa.us.es',
@@ -117,20 +113,24 @@ router.post('/convert/:language', function(req, res, next) {
 			method: 'POST',
 			rejectUnauthorized: false,
 			headers: req.headers
-		};
+		},
+		request = https.request(options, function (response) {
+			var result='';
 
-	console.log('data: '+ data);
-	console.log(options);
-	var request = https.request(options, function (response) {
-		response.on('data', function (d) {
-			try {
-				var data = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(d)));
-				res.json(data);
-			} catch (e) {
-				console.log(e);
-			}
+			response.on('data', function (d) {
+				result += d.toString();
+			});
+
+			response.on('end', function(){
+				console.log(result);
+				try {
+					var data = JSON.parse(result);
+					res.json(data);
+				} catch (e) {
+					console.error(e);
+				}
+			});
 		});
-	});
 
 	request.on('error', function (e) {
 		console.error(e);

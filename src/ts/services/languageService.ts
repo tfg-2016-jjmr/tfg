@@ -38,15 +38,12 @@ export class LanguageService {
             '&desiredFormat='+ desiredFormat +
             '&fileUri='+ '' +
             '&content='+ encodeURIComponent(content);
-        console.log(url);
-        console.log(body);
         let headers = new Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
         headers.append('accept', 'application/json');
         let options = {
             headers: headers
         };
-        console.log(headers);
         return this.http.post(url, body, options)
             .map(res => res.json())
             .catch(this.handleError);
@@ -56,7 +53,6 @@ export class LanguageService {
     private handleError (error: Response) {
         // in a real world app, we may send the server to some remote logging infrastructure
         // instead of just logging it to the console
-        console.error(error);
         // return Observable.throw(error.json().error || 'Server error');
         return Observable.throw('Server error');
     }

@@ -54,11 +54,9 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1) {
                                 config['immediate'] = false;
                                 gapi.auth.authorize(config, function (token) {
                                     if (token && !token.error) {
-                                        console.log('Authorization completed');
                                         resolve(token);
                                     }
                                     else {
-                                        console.log("Authorization error");
                                         reject();
                                     }
                                 });
@@ -91,8 +89,6 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1) {
                                 'userId': userId
                             });
                             request.execute(function (resp) {
-                                console.log('user');
-                                console.log(resp);
                                 user = {
                                     email: resp.emails[0].value,
                                     displayName: resp.displayName,

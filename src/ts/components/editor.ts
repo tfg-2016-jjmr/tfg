@@ -28,45 +28,40 @@ export class Editor implements OnChanges {
     selectedFormat: IFormat;
     oldFormat: IFormat;
     hasError: boolean;
+    ignoreChangeAceEvent: boolean = false;
 
     constructor(public http: Http, private _GS: GoogleService, private _languageService: LanguageService) {}
 
     ngOnChanges(changes: {[propName: string]: SimpleChange}) {
         if (changes['language'] && typeof changes["language"].currentValue !== 'undefined') {
-            //let oldLang: ILanguage = changes["language"].previousValue;
-            //let newLang: ILanguage = changes["language"].currentValue;
             this.setEditorParameters(this.language.formats[0]);
+        }
+        if (changes['selectedFormat']) {
+            console.trace();
         }
 
         if (changes['format']) {
             if (Object.keys(changes['format'].previousValue).length > 0 && Object.keys(changes['format'].currentValue).length > 0
                 || (changes['format'].currentValue != "" && changes['format'].previousValue != "")) {
-                console.log('changed format');
-                console.log(changes["format"].previousValue);
-                console.log(typeof changes["format"].previousValue);
-                console.log(changes["format"].currentValue);
-                console.log(typeof changes["format"].currentValue);
 
-
-                this.oldFormat = changes["format"].previousValue;
-
-                console.log(this.oldFormat);
-                console.log(this.format);
-
-                if (this.config != undefined)
-                    this.convertLanguage(this.format, this.oldFormat);
+                if (this.language != undefined) {
+                    this.oldFormat = this.getFormatFromId(changes["format"].previousValue);
+                    this.selectedFormat = this.getFormatFromId(changes["format"].currentValue);
+                    if (this.selectedFormat.checkLanguage) {
+                        this.convertLanguage(this.selectedFormat.format, this.oldFormat.format);
+                        this.checkEditorLanguage();
+                    } else {
+                        this.convertLanguage(this.selectedFormat.format, this.oldFormat.format);
+                    }
+                }
             }
         }
         if (changes["id"] && typeof changes["id"].currentValue !== 'undefined' && changes["id"].currentValue !== "") {
-            console.log('EDITOR Initialised');
             this.initAce();
             this._GS.authorize().then(
                 () => {
-                    console.log('yahooo en el constructor con ide: ' + this.id);
                     this._GS.loadDriveFile(this.id).then(
                         (file:Object) => {
-                            console.log("THE FILE!!!");
-                            console.log(file);
                             this.fileName = file.title;
                             this.fileNameChange.next(this.fileName);
                             this.fileExtension.next(file.fileExtension);
@@ -74,14 +69,12 @@ export class Editor implements OnChanges {
                                 .map(res => res.text())
                                 .subscribe(
                                     (content) => {
-                                        console.log('succes getting file content');
                                         this.replaceEditorContent(content);
-                                        console.log(this.checkEditorLanguage);
                                         this.checkEditorLanguage();
                                         this.setEditorHandlers();
                                     },
                                     (err) => {
-                                        console.log('error getting file content');
+                                        console.error('error getting file content');
                                     }
                                 )
                         }
@@ -109,19 +102,21 @@ export class Editor implements OnChanges {
     }
 
     replaceEditorContent(newContent: string) {
+        this.ignoreChangeAceEvent = true;
         this.editor.setValue(newContent, -1);
+        if (this.selectedFormat.checkLanguage) {
+            this.checkEditorLanguage();
+        }
+        this.ignoreChangeAceEvent = false;
     }
 
     setEditorParameters(selectedFormat: IFormat){
-        console.log(this.fileExtension);
-        this.selectedFormat= selectedFormat;
+        this.selectedFormat = selectedFormat;
 
         if(this.selectedFormat.editorThemeId){
-            console.log(this.selectedFormat.editorThemeId);
             this.editor.setTheme(this.selectedFormat.editorThemeId);
         }
         if(this.selectedFormat.editorModeId){
-            console.log(selectedFormat.editorModeId);
             this.editor.getSession().setMode(this.selectedFormat.editorModeId);
         }
     }
@@ -131,18 +126,16 @@ export class Editor implements OnChanges {
             this._languageService.postCheckLanguage(this.config.languages[this.language.id], this.selectedFormat.format, this.editor.getValue(), this.fileName)
                 .subscribe(
                     (data: IAnnotations) => {
-                        console.log(data);
+                        this.setAnnotations(data.annotations);
                         if (data.status === 'OK'){
-                            console.log('No errors in this file. Yahooooo!');
                             this.hasError = false;
                         } else {
-                            this.setAnnotations(data.annotations);
                             this.hasError = true;
                         }
                         resolve();
                     },
                     (err) => {
-                        console.log(err);
+                        console.error(err);
                         reject();
                     }
                 );
@@ -152,53 +145,59 @@ export class Editor implements OnChanges {
 
     setEditorHandlers() {
         this.editor.on('change', (content) => {
-            // If after checking language there is no error we can save.
-            if (!this.selectedFormat.checkLanguage)
-                return;
+            if (!this.ignoreChangeAceEvent) {
+                if (this.selectedFormat.checkLanguage) {
+                    this.checkEditorLanguage().then(() => {
+                        if (!this.hasError) {
+                            if (this.saveTimeout !== null) {
+                                clearTimeout(this.saveTimeout);
+                            }
 
-            this.checkEditorLanguage().then(() => {
-                if(!this.hasError){
-                    if (this.saveTimeout !== null) {
-                        clearTimeout(this.saveTimeout);
-                    }
-
-                    this.saveTimeout = setTimeout(() => {
-                            this._GS.saveFileToDrive(this.id, this.editor.getValue());
-                        }, 2000);
+                            this.saveTimeout = setTimeout(() => {
+                                this._GS.saveFileToDrive(this.id, this.editor.getValue());
+                            }, 2000);
+                        }
+                    })
+                } else {
+                    /**
+                     * TODO: Ensure that the file is saved on the original format.
+                     */
                 }
-            })
+            }
         });
     }
 
     convertLanguage(desiredFormat: string, oldFormat: string){
-        console.log('++++++++++++++++++++++++++++++++ in convert language');
-        //console.log(oldFormat);
-        //console.log(desiredFormat);
-
         let langId = this.config.languages[this.language.id],
             content = this.editor.getValue();
 
-        console.log(langId);
-        console.log(content);
-
         if(!this.hasError /*&& content !== null && content !== ""*/) {
-            console.log(this.config);
             this._languageService.convertLanguage(langId, oldFormat, desiredFormat, content, this.fileName)
                 .subscribe(
                     (res: IAnnotations) => {
-                        if(status == 'OK'){
-                            let content = JSON.parse(res.data);
-                            console.log(content);
+                        if(res.status == 'OK'){
+                            let content = res.data;
                             this.replaceEditorContent(content);
                         }
 
                     },
                     (err) => {
-                        console.log(err);
+                        console.error(err);
                     }
                 )
         }else{
             console.log('Default format has errors!');
         }
+    }
+
+    getFormatFromId(formatId: string) : IFormat {
+        let fmt: IFormat;
+        for(let f of this.language.formats) {
+            if(f.format === formatId) {
+                fmt = f;
+                break;
+            }
+        }
+        return fmt;
     }
 }
