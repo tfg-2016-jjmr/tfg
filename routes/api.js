@@ -122,7 +122,6 @@ router.post('/convert/:language', function(req, res, next) {
 			});
 
 			response.on('end', function(){
-				console.log(result);
 				try {
 					var data = JSON.parse(result);
 					res.json(data);
