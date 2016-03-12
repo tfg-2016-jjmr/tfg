@@ -11,15 +11,15 @@ var path = require('path');
 router.get('/configuration', function(req, res, next) {
     var oJSON = {
 		"languages": {
-			"ideas-sedl-language": "/ideas-sedl-language",
+			"sedl-language": "/ideas-sedl-language",
 			"iagree-template-language": "/ideas-iagree-template-language",
 			"iagree-offer-language": "/ideas-iagree-offer-language",
 			"iagree-agreement-language": "/ideas-iagree-agreement-language",
 			"ideas-opl-language": "/ideas-opl-language",
-			"ideas-afm-language": "/ideas-afm-language",
-			"ideas-fmc-language": "/ideas-fmc-language",
-			"ideas-hcs-language": "/ideas-hcs-language",
-			"ideas-needs-language": "/ideas-needs-language",
+			"afm-language": "/ideas-afm-language",
+			"fmc-language": "/ideas-fmc-language",
+			"hcs-language": "/ideas-hcs-language",
+			"needs-language": "/ideas-needs-language",
 			"ideas-plaintext-language": "/ideas-plaintext-language",
 			"ideas-csv-language": "/ideas-csv-language",
 			"ideas-lusdl-language": "/ideas-lusdl-language",
@@ -32,15 +32,6 @@ router.get('/configuration', function(req, res, next) {
 			"logo": "ideas/appLogoBig.png",
 			"search": "ideas/Search.png"
 		},
-		// "googleAnalyticsID": "UA-68297022-1",
-		// "configurationFiles": {
-		//     "application": "classpath*:application.properties",
-		//     "security": "classpath*:security.properties",
-		//     "social": "classpath*:social.properties",
-		//     "email": "classpath*:email.properties"
-		// }
-		// "workbenchName": "IDEAS",
-		// "helpURI": "https://labs.isa.us.es/IDEAS-help/"
 		"baseURI": "https://labs.isa.us.es:8181/"
 	};
     
