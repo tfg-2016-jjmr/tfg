@@ -18,14 +18,17 @@ h1 {
 .wrapper{
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
 }
+
+editor {
+    position: absolute;
+    top: 53px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
 #editor {
-    //z-index: -1;
-    position: relative;
-    height: ~"calc(100% - 112px )";
-    //height: ~"calc(100% - 64px - 48px)";
-    //position: absolute;
-    //top: 64px;
-    //bottom: 24px;
+    height: 100%;
     font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
     *{
         font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
@@ -35,16 +38,23 @@ h1 {
     }
 }
 nav {
+    height: 48px;
+    padding: 0 24px;
+
+    .nav-wrapper {
+        height: 48px;
+
+        .row .col{
+            height: 48px;
+        }
+    }
     .nav-wrapper > a{
         color: #ffffff;
     }
 
-    .brand-logo{
+    .title{
         font-size: 24px;
     }
-
-    padding: 0 24px;
-    //height: 56px;
 
     .user-wrapper{
         display: flex;
@@ -90,6 +100,7 @@ nav {
 
         &:hover,
         &.active{
+            background-color: transparent;
             color: #ffffff;
         }
     }
@@ -117,3 +128,9 @@ footer {
     }
 }
 
+@media only screen and (min-width: 601px){
+    nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i{
+        height: 48px;
+        line-height: 48px;
+    }
+}

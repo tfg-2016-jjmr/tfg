@@ -1,9 +1,4 @@
-<div class="row blue" id="toolbar">
-	<div class="col s8">&nbsp;</div>
-	<div class="col s4 right blue">
-		<ul class="tabs">
-			<li *ngFor="#tab of tabs" (click)="setSelectedTab($event, tab)" class="tab col s2 blue"><a href="#{{ tab }}" class="waves-effect waves-light">{{ tab }}</a></li>
-		</ul>
-		<div *ngFor="#tab of tabs" id="{{ tab }}" class="col s12" style="display: none;"></div>
-	</div>
-</div>
+<ul class="tabs">
+	<li *ngFor="#tab of tabs" (click)="setSelectedTab($event, tab)" class="tab col s3 blue"><a href="#{{ tab }}" class="waves-effect waves-light">{{ tab }}</a></li>
+</ul>
+<div *ngFor="#tab of tabs" id="{{ tab }}" class="col s12" style="display: none;"></div>
