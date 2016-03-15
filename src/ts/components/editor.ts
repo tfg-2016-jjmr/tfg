@@ -36,9 +36,6 @@ export class Editor implements OnChanges {
         if (changes['language'] && typeof changes["language"].currentValue !== 'undefined') {
             this.setEditorParameters(this.language.formats[0]);
         }
-        if (changes['selectedFormat']) {
-            console.trace();
-        }
 
         if (changes['format']) {
             if (Object.keys(changes['format'].previousValue).length > 0 && Object.keys(changes['format'].currentValue).length > 0
@@ -91,8 +88,6 @@ export class Editor implements OnChanges {
 
     initAce() {
         this.editor = ace.edit("editor");
-        //this.editor.setTheme("ace/theme/xcode");
-        // this.editor.getSession().setMode("ace/mode/javascript");
 
         // Disable sintax error
         this.editor.getSession().setUseWorker(false);

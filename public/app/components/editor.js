@@ -43,9 +43,6 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                     if (changes['language'] && typeof changes["language"].currentValue !== 'undefined') {
                         this.setEditorParameters(this.language.formats[0]);
                     }
-                    if (changes['selectedFormat']) {
-                        console.trace();
-                    }
                     if (changes['format']) {
                         if (Object.keys(changes['format'].previousValue).length > 0 && Object.keys(changes['format'].currentValue).length > 0
                             || (changes['format'].currentValue != "" && changes['format'].previousValue != "")) {
@@ -87,8 +84,6 @@ System.register(["angular2/core", "../services/GoogleService", '../services/lang
                 };
                 Editor.prototype.initAce = function () {
                     this.editor = ace.edit("editor");
-                    //this.editor.setTheme("ace/theme/xcode");
-                    // this.editor.getSession().setMode("ace/mode/javascript");
                     // Disable sintax error
                     this.editor.getSession().setUseWorker(false);
                     //Remove 80character vertical line

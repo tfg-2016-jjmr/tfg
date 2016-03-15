@@ -89,23 +89,8 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                             console.error(err);
                         });
                     });
-                    var loadUser = new Promise(function (resolve, reject) {
-                        _this._GS.authorize().then(function (token) {
-                            _this._GS.getUserInfo('me')
-                                .then(function (user) {
-                                _this.setUser(user.email, user.displayName, user.picture);
-                                resolve();
-                            }, function () {
-                                reject();
-                            });
-                        }, function (err) {
-                            console.error(err);
-                            reject();
-                        });
-                    });
                     Promise.all([
-                        getConfigLang,
-                        loadUser
+                        getConfigLang
                     ]).then(function () {
                         _this.fileId = _this.getUrlParameters('ids');
                     });
@@ -131,13 +116,6 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     }
                     return result;
                 };
-                AppComponent.prototype.setUser = function (email, displayname, picture) {
-                    this.user = {
-                        email: email,
-                        displayName: displayname,
-                        picture: picture
-                    };
-                };
                 AppComponent.prototype.extensionSelectedEvent = function (ext) {
                     this.languageSettings = this.languages[ext];
                     var formats = this.languageSettings.formats;
@@ -148,7 +126,6 @@ System.register(['angular2/core', 'angular2/http', './services/languageService',
                     }
                     this.selectedFormat = this.extensions[0];
                     $('ul.tabs').tabs();
-                    //$('ul.tabs').tabs('select_tab', formats[0].format);
                     setTimeout(function () { return $(window).trigger('resize'); }, 100);
                 };
                 AppComponent.prototype.fileNameChangedEvent = function (fileName) {

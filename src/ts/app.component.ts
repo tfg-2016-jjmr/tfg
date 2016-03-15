@@ -50,7 +50,6 @@ export class AppComponent implements OnInit{
      * @type {string}
      */
     fileExtension: string;
-    fileContent: string;
     /**
      * True when the application has loaded all the initial components.
      * @type {boolean}
@@ -120,29 +119,8 @@ export class AppComponent implements OnInit{
                 })
         });
 
-        let loadUser = new Promise((resolve, reject) => {
-            this._GS.authorize().then(
-                (token) => {
-                    this._GS.getUserInfo('me')
-                        .then(
-                            (user:IUser) => {
-                                this.setUser(user.email, user.displayName, user.picture)
-                                resolve();
-                            },
-                            () => {
-                                reject()
-                            }
-                        );
-                },
-                (err) => {
-                    console.error(err);
-                    reject();
-                });
-        });
-
         Promise.all([
-            getConfigLang,
-            loadUser
+            getConfigLang
         ]).then(() => {
             this.fileId = this.getUrlParameters('ids');
         });
@@ -174,15 +152,6 @@ export class AppComponent implements OnInit{
         return result;
     }
 
-
-    setUser(email: string, displayname: string, picture: string) {
-        this.user = {
-            email : email,
-            displayName: displayname,
-            picture: picture
-        };
-    }
-
     extensionSelectedEvent(ext: string) {
         this.languageSettings = this.languages[ext];
         let formats = this.languageSettings.formats;
@@ -192,7 +161,6 @@ export class AppComponent implements OnInit{
         }
         this.selectedFormat = this.extensions[0];
         $('ul.tabs').tabs();
-        //$('ul.tabs').tabs('select_tab', formats[0].format);
         setTimeout(() => $(window).trigger('resize'), 100);
     }
 
